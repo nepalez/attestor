@@ -6,6 +6,8 @@ require_relative "attestor/version"
 
 require_relative "attestor/invalid_error"
 
+require_relative "attestor/validations/item"
+
 # Namespace for the code of the 'attestor' gem
 module Attestor
 
