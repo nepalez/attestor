@@ -14,6 +14,7 @@ require_relative "attestor/validations/message"
 require_relative "attestor/policy"
 require_relative "attestor/policy/node"
 require_relative "attestor/policy/and"
+require_relative "attestor/policy/or"
 
 # Namespace for the code of the 'attestor' gem
 module Attestor
