@@ -289,6 +289,9 @@ Tested under rubies compatible to rubies with API 2.0+:
 
 Uses [RSpec] 3.0+ for testing and [hexx-suit] for dev/test tools collection.
 
+[RSpec]: http://rspec.info
+[hexx-suit]: https://github.com/nepalez/hexx-suit
+
 Contributing
 ------------
 
