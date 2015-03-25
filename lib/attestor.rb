@@ -11,6 +11,7 @@ require_relative "attestor/validations/item"
 require_relative "attestor/validations/collection"
 require_relative "attestor/validations/message"
 
+require_relative "attestor/policy/factory"
 require_relative "attestor/policy"
 require_relative "attestor/policy/node"
 require_relative "attestor/policy/and"
