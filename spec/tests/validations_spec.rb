@@ -2,8 +2,8 @@
 
 describe Attestor::Validations do
 
-  let(:collection_class) { Attestor::Validations::Collection }
-  let(:item_class)       { Attestor::Validations::Item }
+  let(:validators_class) { Attestor::Validations::Validators }
+  let(:validator_class)  { Attestor::Validations::Validator }
   let(:message_class)    { Attestor::Validations::Message }
   let(:invalid_error)    { Attestor::InvalidError }
   let(:test_class)       { Class.new.send(:include, described_class) }
@@ -15,8 +15,8 @@ describe Attestor::Validations do
 
   describe ".validations" do
 
-    it "returns a Collection" do
-      expect(test_class.validations).to be_kind_of collection_class
+    it "returns Validators" do
+      expect(test_class.validations).to be_kind_of validators_class
     end
 
     it "is empty by default" do
@@ -31,7 +31,7 @@ describe Attestor::Validations do
 
       before { test_class.validate :foo }
 
-      it "adds the item to the collection" do
+      it "registers a validator" do
         expect(test_class.validations.to_a).to eq [:foo]
       end
 

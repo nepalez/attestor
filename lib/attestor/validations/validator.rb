@@ -4,10 +4,16 @@ module Attestor
 
   module Validations
 
-    # Describes an item of validations' collection
+    # Describe a validator for class instances
+    #
+    # @example
+    #   validator = Validator.new(:foo, policy: :bar, only: :baz)
+    #
+    #   validator.used_in_context? :baz # => true
+    #   validator.validate object
     #
     # @api private
-    class Item
+    class Validator
 
       # @!scope class
       # @!method new(name, except: [], only: [])
@@ -17,7 +23,7 @@ module Attestor
       # @option [#to_sym, Array<#to_sym>] :except
       # @option [#to_sym, Array<#to_sym>] :only
       #
-      # @return [Attestor::Collection::Item]
+      # @return [Attestor::Validations::Validator]
 
       # @private
       def initialize(name, except: nil, only: nil)
@@ -30,6 +36,7 @@ module Attestor
 
       # @!attribute [r] name
       # The name of the item
+      #
       # @return [Symbol]
       attr_reader :name
 
@@ -80,7 +87,7 @@ module Attestor
         Array(list).map(&:to_sym).uniq
       end
 
-    end # class Item
+    end # class Validator
 
   end # module Validations
 

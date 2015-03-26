@@ -44,11 +44,11 @@ module Attestor
 
       # Returns a collection of items describing applied validations
       #
-      # @return [Attestor::Collection]
+      # @return [Attestor::Validators]
       #
       # @api private
       def validations
-        @validations ||= Collection.new
+        @validations ||= Validators.new
       end
 
       # Adds an item to {#validations}
@@ -62,7 +62,7 @@ module Attestor
       # @option options [#to_sym, Array<#to_sym>] :only
       #   the white list of contexts for validation
       #
-      # @return [Attestor::Collection] the updated collection
+      # @return [Attestor::Validators] the updated collection
       def validate(name, options = {})
         @validations = validations.add(name, options)
       end

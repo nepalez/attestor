@@ -7,16 +7,16 @@ module Attestor
     # The collection of validations used by class instances
     #
     # @api private
-    class Collection
+    class Validators
       include Enumerable
 
       # @!scope class
       # @!method new(items = [])
       # Creates an immutable collection with optional list of items
       #
-      # @param [Array<Attestor::Collection::Item>] items
+      # @param [Array<Attestor::Validators::Validator>] items
       #
-      # @return [Attestor::Collection]
+      # @return [Attestor::Validators]
 
       # @private
       def initialize(items = [])
@@ -27,7 +27,7 @@ module Attestor
       # Iterates through the collection
       #
       # @yield the block
-      # @yieldparam [Attestor::Collection::Item] item
+      # @yieldparam [Attestor::Validators::Validator] item
       #   items from the collection
       #
       # @return [Enumerator]
@@ -43,9 +43,9 @@ module Attestor
       # @option options [Array<#to_sym>] :except
       # @option options [Array<#to_sym>] :only
       #
-      # @return [Attestor::Collection]
+      # @return [Attestor::Validators]
       def add(name, options = {})
-        item = Item.new(name, options)
+        item = Validator.new(name, options)
         return self if items.include? item
 
         self.class.new(items + [item])
@@ -55,7 +55,7 @@ module Attestor
       #
       # @param  [#to_sym] context
       #
-      # @return [Attestor::Collection]
+      # @return [Attestor::Validators]
       def set(context)
         collection = items.select { |item| item.used_in_context? context }
 
@@ -66,7 +66,7 @@ module Attestor
 
       attr_reader :items
 
-    end # class Collection
+    end # class Validators
 
   end # module Validations
 

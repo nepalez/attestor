@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-describe Attestor::Validations::Collection do
+describe Attestor::Validations::Validators do
 
-  let(:item_class) { Attestor::Validations::Item }
+  let(:item_class) { Attestor::Validations::Validator }
 
   describe ".new" do
 
@@ -22,7 +22,7 @@ describe Attestor::Validations::Collection do
       expect(subject.each).to be_kind_of Enumerator
     end
 
-    it "iterates trough the unique item names" do
+    it "iterates trough validators' names" do
       items   = %w(foo bar foo).map(&item_class.method(:new))
       subject = described_class.new items
 
@@ -37,11 +37,11 @@ describe Attestor::Validations::Collection do
 
       let(:result) { subject.add("foo") }
 
-      it "returns the collection" do
+      it "returns validators" do
         expect(result).to be_kind_of described_class
       end
 
-      it "adds item to the collection" do
+      it "adds item to validators" do
         item = result.first
         expect(item).to eq :foo
       end
@@ -56,7 +56,7 @@ describe Attestor::Validations::Collection do
 
       let(:result) { subject.add "foo", only: [:foo] }
 
-      it "adds item to the collection" do
+      it "adds item to validators" do
         expect(result.to_a).to eq [:foo]
         expect(result.set(:foo).to_a).to eq [:foo]
         expect(result.set(:all).to_a).to eq []
@@ -64,7 +64,7 @@ describe Attestor::Validations::Collection do
 
     end # context
 
-    context "existing item" do
+    context "existing validator" do
 
       subject { described_class.new.add "foo" }
 
@@ -97,4 +97,4 @@ describe Attestor::Validations::Collection do
 
   end # describe #context
 
-end # describe Attestor::Collection
+end # describe Attestor::Validators

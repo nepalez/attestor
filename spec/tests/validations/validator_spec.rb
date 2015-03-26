@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-describe Attestor::Validations::Item do
+describe Attestor::Validations::Validator do
 
   subject { described_class.new "foo" }
 
