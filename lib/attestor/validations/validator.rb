@@ -4,10 +4,16 @@ module Attestor
 
   module Validations
 
-    # Describes an item of validations' collection
+    # Describe a validator for class instances
+    #
+    # @example
+    #   validator = Validator.new(:foo, policy: :bar, only: :baz)
+    #
+    #   validator.used_in_context? :baz # => true
+    #   validator.validate object
     #
     # @api private
-    class Item
+    class Validator
 
       # @!scope class
       # @!method new(name, except: [], only: [])
@@ -17,11 +23,12 @@ module Attestor
       # @option [#to_sym, Array<#to_sym>] :except
       # @option [#to_sym, Array<#to_sym>] :only
       #
-      # @return [Attestor::Collection::Item]
+      # @return [Attestor::Validators::Validator]
 
       # @private
-      def initialize(name, except: nil, only: nil)
+      def initialize(name, except: nil, only: nil, policy: nil)
         @name      = name.to_sym
+        @policy    = policy
         @whitelist = normalize(only)
         @blacklist = normalize(except)
         generate_id
@@ -30,8 +37,17 @@ module Attestor
 
       # @!attribute [r] name
       # The name of the item
+      #
       # @return [Symbol]
       attr_reader :name
+
+      # @!method policy?
+      # Whether the validator uses a policy
+      #
+      # @return [Boolean]
+      def policy?
+        @policy ? true : false
+      end
 
       # Compares an item to another one
       #
@@ -50,6 +66,19 @@ module Attestor
       def used_in_context?(context)
         symbol = context.to_sym
         whitelisted?(symbol) && !blacklisted?(symbol)
+      end
+
+      # Validates given object
+      #
+      # @param [Object] object
+      #
+      # @raise [Attestor::InvalidError]
+      #   if object doesn't match validation rule
+      #
+      # @return [undefined]
+      def validate(object)
+        result = object.__send__(name)
+        object.__send__(:invalid, name) if policy? && result.invalid?
       end
 
       protected
@@ -80,7 +109,7 @@ module Attestor
         Array(list).map(&:to_sym).uniq
       end
 
-    end # class Item
+    end # class Validator
 
   end # module Validations
 

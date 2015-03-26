@@ -7,9 +7,9 @@ require_relative "attestor/version"
 require_relative "attestor/invalid_error"
 
 require_relative "attestor/validations"
-require_relative "attestor/validations/item"
-require_relative "attestor/validations/collection"
 require_relative "attestor/validations/message"
+require_relative "attestor/validations/validator"
+require_relative "attestor/validations/validators"
 
 require_relative "attestor/policy/factory"
 require_relative "attestor/policy"

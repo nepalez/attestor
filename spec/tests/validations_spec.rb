@@ -1,8 +1,10 @@
 # encoding: utf-8
 
+require "support/policies" # for #valid_policy and #invalid_policy definitions
+
 describe Attestor::Validations do
 
-  let(:collection_class) { Attestor::Validations::Collection }
+  let(:collection_class) { Attestor::Validations::Validators }
   let(:item_class)       { Attestor::Validations::Item }
   let(:message_class)    { Attestor::Validations::Message }
   let(:invalid_error)    { Attestor::InvalidError }
@@ -13,17 +15,17 @@ describe Attestor::Validations do
 
   subject { test_class.new }
 
-  describe ".validations" do
+  describe ".validators" do
 
     it "returns a Collection" do
-      expect(test_class.validations).to be_kind_of collection_class
+      expect(test_class.validators).to be_kind_of collection_class
     end
 
     it "is empty by default" do
-      expect(test_class.validations.to_a).to be_empty
+      expect(test_class.validators.to_a).to be_empty
     end
 
-  end # describe .validations
+  end # describe .validators
 
   describe ".validate" do
 
@@ -31,58 +33,59 @@ describe Attestor::Validations do
 
       before { test_class.validate :foo }
 
-      it "adds the item to the collection" do
-        expect(test_class.validations.to_a).to eq [:foo]
+      it "registers a validator" do
+        expect(test_class.validators.map(&:name)).to eq [:foo]
+      end
+
+      it "sets a validator's policy to false" do
+        expect(test_class.validators.first).not_to be_policy
       end
 
     end # context
 
-    context "with options" do
+    context "with restrictions" do
 
       before { test_class.validate :foo, only: %w(bar baz), except: "bar" }
 
       it "uses options" do
-        expect(test_class.validations.to_a).to eq [:foo]
-        expect(test_class.validations.set(:baz).to_a).to eq [:foo]
-        expect(test_class.validations.set(:bar).to_a).to eq []
+        expect(test_class.validators.map(&:name)).to eq [:foo]
+        expect(test_class.validators.set(:baz).map(&:name)).to eq [:foo]
+        expect(test_class.validators.set(:bar).map(&:name)).to eq []
       end
 
     end # context
 
   end # describe .validate
 
-  describe "#validate" do
+  describe ".follow_policy" do
 
-    before do
-      test_class.validate :foo
-      test_class.validate :bar, only: :all
-      test_class.validate :baz, only: :foo
-      %i(foo bar baz).each { |method| allow(subject).to receive(method) }
-    end
+    context "without options" do
 
-    context "without an argument" do
+      before { test_class.follow_policy :foo }
 
-      it "calls validations for :all context" do
-        expect(subject).to receive(:foo)
-        expect(subject).to receive(:bar)
-        expect(subject).not_to receive(:baz)
-        subject.validate
+      it "registers a validator" do
+        expect(test_class.validators.map(&:name)).to eq [:foo]
+      end
+
+      it "sets a validator's policy to true" do
+        expect(test_class.validators.first).to be_policy
       end
 
     end # context
 
-    context ":foo" do
+    context "with restrictions" do
 
-      it "calls validations for :foo context" do
-        expect(subject).to receive(:foo)
-        expect(subject).to receive(:baz)
-        expect(subject).not_to receive(:bar)
-        subject.validate :foo
+      before { test_class.follow_policy :foo, only: %w(bar baz), except: "bar" }
+
+      it "uses options" do
+        expect(test_class.validators.map(&:name)).to eq [:foo]
+        expect(test_class.validators.set(:baz).map(&:name)).to eq [:foo]
+        expect(test_class.validators.set(:bar).map(&:name)).to eq []
       end
 
     end # context
 
-  end # describe #validate
+  end # describe .follow_policy
 
   describe "#invalid" do
 
@@ -122,5 +125,41 @@ describe Attestor::Validations do
     end
 
   end # invalid
+
+  describe "#validate" do
+
+    before do
+      test_class.validate :foo
+      test_class.validate :bar, only: :all
+      test_class.follow_policy :baz, only: :foo
+
+      allow(subject).to receive(:foo)
+      allow(subject).to receive(:bar)
+      allow(subject).to receive(:baz) { valid_policy }
+    end
+
+    context "without an argument" do
+
+      it "calls validators for :all context" do
+        expect(subject).to receive(:foo)
+        expect(subject).to receive(:bar)
+        expect(subject).not_to receive(:baz)
+        subject.validate
+      end
+
+    end # context
+
+    context ":foo" do
+
+      it "calls validators for :foo context" do
+        expect(subject).to receive(:foo)
+        expect(subject).to receive(:baz)
+        expect(subject).not_to receive(:bar)
+        subject.validate :foo
+      end
+
+    end # context
+
+  end # describe #validate
 
 end # describe Attestor::Validations

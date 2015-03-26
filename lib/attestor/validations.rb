@@ -8,11 +8,11 @@ module Attestor
     # Calls all validations used in the selected context
     #
     # @raise [Attestor::Validations::InvalidError] if validations fail
-    # @raise [NoMethodError] if some of validations are not implemented
+    # @raise [NoMethodError] if some of validators are not implemented
     #
     # @return [undefined]
     def validate(context = :all)
-      self.class.validations.set(context).each(&method(:__send__))
+      self.class.validators.set(context).each { |item| item.validate(self) }
     end
 
     # Raises InvalidError with a corresponding message
@@ -42,18 +42,18 @@ module Attestor
     # @private
     module ClassMethods
 
-      # Returns a collection of items describing applied validations
+      # Returns a collection of items describing applied validators
       #
       # @return [Attestor::Collection]
       #
       # @api private
-      def validations
-        @validations ||= Collection.new
+      def validators
+        @validators ||= Validators.new
       end
 
-      # Adds an item to {#validations}
+      # Registers a validator
       #
-      # Mutates the class by changing its {#validations} attribute!
+      # Mutates the class by changing its {#validators} attribute!
       #
       # @param [#to_sym] name
       # @param [Hash] options
@@ -64,7 +64,23 @@ module Attestor
       #
       # @return [Attestor::Collection] the updated collection
       def validate(name, options = {})
-        @validations = validations.add(name, options)
+        @validators = validators.add(name, options)
+      end
+
+      # Registers a followed policy
+      #
+      # Mutates the class by changing its {#validators} attribute!
+      #
+      # @param [#to_sym] name
+      # @param [Hash] options
+      # @option options [#to_sym, Array<#to_sym>] :except
+      #   the black list of contexts for validation
+      # @option options [#to_sym, Array<#to_sym>] :only
+      #   the white list of contexts for validation
+      #
+      # @return [Attestor::Collection] the updated collection
+      def follow_policy(name, options = {})
+        @validators = validators.add(name, options.merge(policy: true))
       end
 
     end # module ClassMethods

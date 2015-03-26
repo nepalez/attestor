@@ -1,6 +1,8 @@
 # encoding: utf-8
 
-describe Attestor::Validations::Item do
+require "support/policies"
+
+describe Attestor::Validations::Validator do
 
   subject { described_class.new "foo" }
 
@@ -36,9 +38,13 @@ describe Attestor::Validations::Item do
         .to eq(described_class.new "foo", only: %i(bar))
     end
 
+    it "accepts array option :policy" do
+      expect { described_class.new "foo", policy: :bar }.not_to raise_error
+    end
+
   end # describe .new
 
-  describe ".name" do
+  describe "#name" do
 
     it "is initialized as a symbol" do
       expect(subject.name).to eq :foo
@@ -46,11 +52,24 @@ describe Attestor::Validations::Item do
 
   end # describe .name
 
+  describe "#policy?" do
+
+    it "is set to false by default" do
+      expect(subject.policy?).to eq false
+    end
+
+    it "can be initialized" do
+      subject = described_class.new "foo", policy: 1
+      expect(subject.policy?).to eq true
+    end
+
+  end # describe #policy?
+
   describe "#==" do
 
     subject { described_class.new :foo, except: [:foo], only: %i(bar) }
 
-    context "item with the same name and options" do
+    context "item with the same arguments" do
 
       let(:other) { described_class.new :foo, except: %i(foo), only: %i(bar) }
 
@@ -149,5 +168,52 @@ describe Attestor::Validations::Item do
     end
 
   end # describe #name
+
+  describe "#validate" do
+
+    after { subject.validate object }
+
+    context "when a #policy isn't set" do
+
+      let(:object) { double foo: nil }
+      subject { described_class.new :foo }
+
+      it "calls validation method" do
+        expect(object).to receive :foo
+      end
+
+    end # context
+
+    context "when a #policy is set to valid policy" do
+
+      let(:object) { double foo: valid_policy }
+      subject { described_class.new :foo, policy: true }
+
+      it "calls policy method" do
+        expect(object).to receive(:foo)
+      end
+
+      it "doesn't call #invalid" do
+        expect(object).not_to receive(:invalid)
+      end
+
+    end # context
+
+    context "when a #policy is set to valid policy" do
+
+      let(:object) { double foo: invalid_policy, invalid: nil }
+      subject { described_class.new :foo, policy: true }
+
+      it "calls policy method" do
+        expect(object).to receive(:foo)
+      end
+
+      it "calls #invalid with name" do
+        expect(object).to receive(:invalid).with(:foo)
+      end
+
+    end # context
+
+  end # describe #validate
 
 end # describe Attestor::Validation

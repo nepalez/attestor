@@ -66,8 +66,6 @@ gem install attestor
 Basic Use
 ----------
 
-`Attestor::Validations` API consists of 1 class method `.validate` and 2 instance methods (`validate` and `invalid`).
-
 Declare validation in the same way as ActiveModel's `.validate` method does:
 
 ```ruby
@@ -95,8 +93,9 @@ end
 
 The `#invalid` method translates its argument in a current class scope and raises an exception.
 
-```ruby
+```yaml
 # config/locales/en.yml
+---
 en:
   attestor:
     errors:
@@ -120,7 +119,7 @@ rescue => error
 end
 ```
 
-Adding Contexts
+Use of Contexts
 ---------------
 
 Sometimes you need to validate the object agaist the subset of validations, not all of them.
@@ -142,17 +141,17 @@ fraud_transfer.validate                 # => InvalidError
 fraud_transfer.validate :steal_of_money # => PASSES!
 ```
 
-Just as the `:except` option blacklists validations, the `:only` method whitelists them:
+You can use the same validator several times with different contexts. Any validation will be made independently from the others:
 
 ```ruby
-class Transfer < Struct.new(:debet, :credit)
-  include Attestor::Validations
-
+class Transfer
+  # ...
   validate :consistent, only: :fair_trade
-end
+  validate :consistent, only: :legal
 
-fraud_transfer.validate             # => PASSES
-fraud_transfer.validate :fair_trade # => InvalidError
+  # This is the same as:
+  # validate :consistent, only: [:fair_trade, :legal]
+end
 ```
 
 Policy Objects
@@ -162,7 +161,7 @@ Extract a validator to the separate object (policy). Basically the policy includ
 
 ```ruby
 class ConsistencyPolicy < Struct.new(:debet, :credit)
-  include Attestor::Policy
+  include Attestor::Policy # includes Attestor::Validator as well
 
   validate :consistent
 
@@ -179,33 +178,40 @@ This looks mainly the same as before. But the policy's debet and credit are numb
 
 This is the core part of the [Policy Object design pattern] - it isolates the rule from unsignificant details of the target.
 
-From the other hand, the target needs to know nothing about how the policy works with data:
+When you have a policy to follow, use the `follow_policy` method:
 
 ```ruby
 class Transfer < Struct.new(:debet, :credit)
   include Attestor::Validations
 
-  validate :constistent
+  follow_policy :consistency, only: :fair_trade
 
   private
 
-  def consistent
-    policy = ConsistencyPolicy.new(debet.sum, credit.sum)
-    invalid :inconsistent if policy.invalid?
+  def consistency # should respond to #valid? and #invalid?
+    ConsistencyPolicy.new(debet.sum, credit.sum)
   end
 end
 ```
 
-The "new" method `valid?` just returns true or false, trowing error messages out as unsignificant details.
+In case the policy object is invalid, validation raises an exception.
 
-If you need messages from policy, you can use `validate` method and capture its exception. But should you?! Instead you'd better to provie the message, that makes sense in the Transfer context.
+The name of the method (`consistency`) will be used for the error message:
 
-[Policy Object design pattern]: http://blog.codeclimate.com/blog/2012/10/17/7-ways-to-decompose-fat-activerecord-models/
+```yaml
+# config/locales/en.yml
+---
+en:
+  attestor:
+    errors:
+      transfer:
+        consistency: "The transfer is inconsistent"
+```
 
 Complex Policies
 ----------------
 
-Now that we isolated policies, we can provide complex policies from simpler ones.
+Now that policies are isolated from their targets, we can provide complex policies from simpler ones.
 
 Suppose we have two policy objects:
 
@@ -214,7 +220,7 @@ valid_policy.valid?   # => true
 invalid_policy.valid? # => false
 ```
 
-Use `Policy` factory methods to provide compositions:
+Use factory methods to provide compositions:
 
 ```ruby
 complex_policy = valid_policy.not
@@ -233,7 +239,7 @@ complex_policy = valid_policy.xor(valid_poicy, invalid_policy)
 complex_policy.validate # => passes
 ```
 
-The `or`, `and` and `xor` methods, called without argument(s), don't provide a policy object. They return lazy composer, expecting `#not` method.
+The `or`, `and` and `xor` methods called without argument(s) don't provide a policy object. They return lazy composer, expecting `#not` method.
 
 ```ruby
 complex_policy = valid_policy.and.not(invalid_policy, invalid_policy)
@@ -245,38 +251,19 @@ If you prefer wrapping to chaining, use the `Policy` factory methods instead:
 
 ```ruby
 Policy.and(valid_policy, invalid_policy)
-# this is the same as: valid_policy.and invalid_policy
+# this is the same as: valid_policy.and(invalid_policy)
 
 Policy.or(valid_policy, invalid_policy)
-# this is the same as: valid_policy.or invalid_policy
+# this is the same as: valid_policy.or(invalid_policy)
 
 Policy.xor(valid_policy, invalid_policy)
-# this is the same as: valid_policy.xor invalid_policy
+# this is the same as: valid_policy.xor(invalid_policy)
 
 Policy.not(valid_policy)
 # this is the same as: valid_policy.not
 ```
 
 As before, you can use any number of policies (except for negation of a single policy) at any number of nesting.
-
-This can be used either in targets or in complex policies. In the later case do it like this:
-
-```ruby
-class ComplexPolicy < Struct.new(:a, :b, :c)
-  include Attestor::Policy
-
-  validate :complex_rule
-
-  private
-
-  def complex_rule
-    first_policy  = FirstPolicy.new(a, b)
-    second_policy = SecondPolicy.new(b, c)
-
-    invalid :base unless first_policy.xor(second_policy).valid?
-  end
-end
-```
 
 Compatibility
 -------------
