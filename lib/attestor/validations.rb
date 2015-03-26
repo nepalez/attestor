@@ -12,7 +12,7 @@ module Attestor
     #
     # @return [undefined]
     def validate(context = :all)
-      self.class.validators.set(context).each(&method(:__send__))
+      self.class.validators.set(context).each { |item| item.validate(self) }
     end
 
     # Raises InvalidError with a corresponding message
@@ -51,7 +51,7 @@ module Attestor
         @validators ||= Validators.new
       end
 
-      # Adds an item to {#validators}
+      # Registers a validator
       #
       # Mutates the class by changing its {#validators} attribute!
       #
@@ -65,6 +65,22 @@ module Attestor
       # @return [Attestor::Validators] the updated collection
       def validate(name, options = {})
         @validators = validators.add(name, options)
+      end
+
+      # Registers a followed policy
+      #
+      # Mutates the class by changing its {#validators} attribute!
+      #
+      # @param [#to_sym] name
+      # @param [Hash] options
+      # @option options [#to_sym, Array<#to_sym>] :except
+      #   the black list of contexts for validation
+      # @option options [#to_sym, Array<#to_sym>] :only
+      #   the white list of contexts for validation
+      #
+      # @return [Attestor::Collection] the updated collection
+      def follow_policy(name, options = {})
+        @validators = validators.add(name, options.merge(policy: true))
       end
 
     end # module ClassMethods

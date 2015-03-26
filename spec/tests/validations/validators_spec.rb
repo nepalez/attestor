@@ -2,7 +2,7 @@
 
 describe Attestor::Validations::Validators do
 
-  let(:item_class) { Attestor::Validations::Validator }
+  let(:validator_class) { Attestor::Validations::Validator }
 
   describe ".new" do
 
@@ -22,11 +22,11 @@ describe Attestor::Validations::Validators do
       expect(subject.each).to be_kind_of Enumerator
     end
 
-    it "iterates trough validators' names" do
-      items   = %w(foo bar foo).map(&item_class.method(:new))
-      subject = described_class.new items
+    it "iterates trough validators" do
+      validators = %w(foo bar foo).map(&validator_class.method(:new))
+      subject = described_class.new validators
 
-      expect(subject.to_a).to match_array %i(foo bar)
+      expect(subject.to_a).to match_array validators
     end
 
   end # describe #each
@@ -43,11 +43,11 @@ describe Attestor::Validations::Validators do
 
       it "adds item to validators" do
         item = result.first
-        expect(item).to eq :foo
+        expect(item.name).to eq :foo
       end
 
       it "preserves existing items" do
-        expect(result.add(:bar).to_a).to contain_exactly :foo, :bar
+        expect(result.add(:bar).map(&:name)).to contain_exactly :foo, :bar
       end
 
     end # context
@@ -57,9 +57,9 @@ describe Attestor::Validations::Validators do
       let(:result) { subject.add "foo", only: [:foo] }
 
       it "adds item to validators" do
-        expect(result.to_a).to eq [:foo]
-        expect(result.set(:foo).to_a).to eq [:foo]
-        expect(result.set(:all).to_a).to eq []
+        expect(result.map(&:name)).to eq [:foo]
+        expect(result.set(:foo).map(&:name)).to eq [:foo]
+        expect(result.set(:all).map(&:name)).to eq []
       end
 
     end # context
@@ -90,9 +90,9 @@ describe Attestor::Validations::Validators do
     end
 
     it "returns a set of items used in given context" do
-      expect(subject.set("cad").to_a).to contain_exactly :foo, :baz
-      expect(subject.set("cam").to_a).to contain_exactly :foo, :bar
-      expect(subject.set("all").to_a).to contain_exactly :bar, :baz
+      expect(subject.set("cad").map(&:name)).to contain_exactly :foo, :baz
+      expect(subject.set("cam").map(&:name)).to contain_exactly :foo, :bar
+      expect(subject.set("all").map(&:name)).to contain_exactly :bar, :baz
     end
 
   end # describe #context

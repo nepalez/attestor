@@ -5,8 +5,13 @@ describe "Base example" do
   before do
     Account     = Struct.new(:client, :limit)
     Transaction = Struct.new(:account, :sum)
+    Transfer    = Struct.new(:debet, :credit)
 
-    class ConsistencyPolicy < Struct.new(:debet, :credit)
+    ConsistencyPolicy = Struct.new(:debet, :credit)
+    LimitPolicy       = Struct.new(:transaction)
+    InternalTransfer  = Struct.new(:debet, :credit)
+
+    class ConsistencyPolicy
       include Attestor::Policy
 
       validate :consistent
@@ -19,7 +24,7 @@ describe "Base example" do
       end
     end
 
-    class LimitPolicy < Struct.new(:transaction)
+    class LimitPolicy
       include Attestor::Policy
 
       validate :limited
@@ -32,7 +37,7 @@ describe "Base example" do
       end
     end
 
-    class InternalTransfer < Struct.new(:debet, :credit)
+    class InternalTransfer
       include Attestor::Policy
 
       validate :internal
@@ -45,29 +50,24 @@ describe "Base example" do
       end
     end
 
-    class Transfer < Struct.new(:debet, :credit)
+    class Transfer
       include Attestor::Validations
 
-      validate :internal, only: :blocked
-      validate :consistent
-      validate :limited
+      follow_policy :consistent
+      follow_policy :limited, except: :blocked
+      follow_policy :internal,  only: :blocked
 
       private
 
-      def internal
-        invalid :external if internal_transfer.invalid?
-      end
-
       def consistent
-        invalid :inconsistent if ConsistencyPolicy.new(debet, credit).invalid?
+        ConsistencyPolicy.new(debet, credit)
       end
 
       def limited
-        return if internal_transfer.or(LimitPolicy.new(debet)).valid?
-        invalid :over_the_limit
+        LimitPolicy.new(debet).or internal
       end
 
-      def internal_transfer
+      def internal
         InternalTransfer.new(debet, credit)
       end
     end
@@ -90,9 +90,10 @@ describe "Base example" do
 
   it "works fine" do
     expect { a_to_a.validate }.not_to raise_error
-    expect { a_to_b.validate }.to raise_error
     expect { b_to_a.validate }.not_to raise_error
-    expect { b_to_a.validate :blocked }.to raise_error
+
+    expect { a_to_b.validate }.to raise_error Attestor::InvalidError
+    expect { b_to_a.validate :blocked }.to raise_error Attestor::InvalidError
   end
 
   after do

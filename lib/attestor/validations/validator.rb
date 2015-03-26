@@ -26,8 +26,9 @@ module Attestor
       # @return [Attestor::Validations::Validator]
 
       # @private
-      def initialize(name, except: nil, only: nil)
+      def initialize(name, except: nil, only: nil, policy: nil)
         @name      = name.to_sym
+        @policy    = policy
         @whitelist = normalize(only)
         @blacklist = normalize(except)
         generate_id
@@ -39,6 +40,14 @@ module Attestor
       #
       # @return [Symbol]
       attr_reader :name
+
+      # @!method policy?
+      # Whether the validator uses a policy
+      #
+      # @return [Boolean]
+      def policy?
+        @policy ? true : false
+      end
 
       # Compares an item to another one
       #
@@ -57,6 +66,19 @@ module Attestor
       def used_in_context?(context)
         symbol = context.to_sym
         whitelisted?(symbol) && !blacklisted?(symbol)
+      end
+
+      # Validates given object
+      #
+      # @param [Object] object
+      #
+      # @raise [Attestor::InvalidError]
+      #   if object doesn't match validation rule
+      #
+      # @return [undefined]
+      def validate(object)
+        result = object.__send__(name)
+        object.__send__(:invalid, name) if policy? && result.invalid?
       end
 
       protected

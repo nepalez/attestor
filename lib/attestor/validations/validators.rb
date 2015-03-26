@@ -32,34 +32,34 @@ module Attestor
       #
       # @return [Enumerator]
       def each
-        return to_enum unless block_given?
-        items.map(&:name).uniq.each { |item| yield(item) }
+        block_given? ? @items.each { |item| yield(item) } : to_enum
       end
 
-      # Returns the collection, updated with new item
+      # Returns validators updated by new item
       #
       # @param  [#to_sym] name
       # @param  [Hash] options
       # @option options [Array<#to_sym>] :except
       # @option options [Array<#to_sym>] :only
+      # @option options [Symbol, nil] :policy
       #
       # @return [Attestor::Validators]
       def add(name, options = {})
         item = Validator.new(name, options)
-        return self if items.include? item
+        return self if include? item
 
-        self.class.new(items + [item])
+        self.class.new(@items + [item])
       end
 
-      # Returns the collection of items used in given context
+      # Returns validators used in given context
       #
       # @param  [#to_sym] context
       #
       # @return [Attestor::Validators]
       def set(context)
-        collection = items.select { |item| item.used_in_context? context }
+        validators = select { |item| item.used_in_context? context }
 
-        self.class.new(collection)
+        self.class.new(validators)
       end
 
       private
