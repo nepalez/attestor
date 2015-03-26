@@ -99,7 +99,7 @@ The `#invalid` method translates its argument in a current class scope and raise
 # config/locales/en.yml
 en:
   attestor:
-    validations:
+    errors:
       transfer:
         inconsistent: "Credit differs from debet by %{fraud}"
 ```
