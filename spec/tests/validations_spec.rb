@@ -13,17 +13,17 @@ describe Attestor::Validations do
 
   subject { test_class.new }
 
-  describe ".validations" do
+  describe ".validators" do
 
     it "returns Validators" do
-      expect(test_class.validations).to be_kind_of validators_class
+      expect(test_class.validators).to be_kind_of validators_class
     end
 
     it "is empty by default" do
-      expect(test_class.validations.to_a).to be_empty
+      expect(test_class.validators.to_a).to be_empty
     end
 
-  end # describe .validations
+  end # describe .validators
 
   describe ".validate" do
 
@@ -32,7 +32,7 @@ describe Attestor::Validations do
       before { test_class.validate :foo }
 
       it "registers a validator" do
-        expect(test_class.validations.to_a).to eq [:foo]
+        expect(test_class.validators.to_a).to eq [:foo]
       end
 
     end # context
@@ -42,9 +42,9 @@ describe Attestor::Validations do
       before { test_class.validate :foo, only: %w(bar baz), except: "bar" }
 
       it "uses options" do
-        expect(test_class.validations.to_a).to eq [:foo]
-        expect(test_class.validations.set(:baz).to_a).to eq [:foo]
-        expect(test_class.validations.set(:bar).to_a).to eq []
+        expect(test_class.validators.to_a).to eq [:foo]
+        expect(test_class.validators.set(:baz).to_a).to eq [:foo]
+        expect(test_class.validators.set(:bar).to_a).to eq []
       end
 
     end # context
@@ -62,7 +62,7 @@ describe Attestor::Validations do
 
     context "without an argument" do
 
-      it "calls validations for :all context" do
+      it "calls validators for :all context" do
         expect(subject).to receive(:foo)
         expect(subject).to receive(:bar)
         expect(subject).not_to receive(:baz)
@@ -73,7 +73,7 @@ describe Attestor::Validations do
 
     context ":foo" do
 
-      it "calls validations for :foo context" do
+      it "calls validators for :foo context" do
         expect(subject).to receive(:foo)
         expect(subject).to receive(:baz)
         expect(subject).not_to receive(:bar)

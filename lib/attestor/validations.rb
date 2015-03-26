@@ -5,14 +5,14 @@ module Attestor
   # API for objects to be validated
   module Validations
 
-    # Calls all validations used in the selected context
+    # Calls all validators for given context
     #
-    # @raise [Attestor::Validations::InvalidError] if validations fail
-    # @raise [NoMethodError] if some of validations are not implemented
+    # @raise [Attestor::Validations::InvalidError] if validators fail
+    # @raise [NoMethodError] if some of validators are not implemented
     #
     # @return [undefined]
     def validate(context = :all)
-      self.class.validations.set(context).each(&method(:__send__))
+      self.class.validators.set(context).each(&method(:__send__))
     end
 
     # Raises InvalidError with a corresponding message
@@ -42,18 +42,18 @@ module Attestor
     # @private
     module ClassMethods
 
-      # Returns a collection of items describing applied validations
+      # Returns a collection of applied validators
       #
       # @return [Attestor::Validators]
       #
       # @api private
-      def validations
-        @validations ||= Validators.new
+      def validators
+        @validators ||= Validators.new
       end
 
-      # Adds an item to {#validations}
+      # Adds an item to {#validators}
       #
-      # Mutates the class by changing its {#validations} attribute!
+      # Mutates the class by changing its {#validators} attribute!
       #
       # @param [#to_sym] name
       # @param [Hash] options
@@ -64,7 +64,7 @@ module Attestor
       #
       # @return [Attestor::Validators] the updated collection
       def validate(name, options = {})
-        @validations = validations.add(name, options)
+        @validators = validators.add(name, options)
       end
 
     end # module ClassMethods
