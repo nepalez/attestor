@@ -157,15 +157,11 @@ Policy Objects
 
 Extract a validator to the separate object (policy). Basically the policy includes `Attestor::Validations` with additional methods.
 
+To create a policy as a `Struct` use the builder method:
+
 ```ruby
-class ConsistencyPolicy < Struct.new(:debet, :credit)
-  include Attestor::Policy # includes Attestor::Validator as well
-
-  validate :consistent
-
-  private
-
-  def consistent
+ConsistencyPolicy = Attestor::Policy.new(:debet, :credit) do
+  def validate
     fraud = credit - debet
     invalid :inconsistent, fraud: fraud if fraud != 0
   end
