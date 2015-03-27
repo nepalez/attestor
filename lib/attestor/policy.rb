@@ -16,6 +16,27 @@ module Attestor
       end
     end
 
+    # Builds the policy class
+    #
+    # @example
+    #   MyPolicy = Attestor::Policy.new(:foo, :bar) do
+    #     attr_reader :baz
+    #   end
+    #
+    # @attribute [Array<#to_sym>] attributes
+    #   the list of attributes
+    # @attribute [Proc] block
+    #
+    # @yield the block in the scope of created class
+    #
+    # @return [Class]
+    def self.new(*attributes, &block)
+      Struct.new(*attributes) do
+        include Attestor::Policy
+        instance_eval(&block) if block_given?
+      end
+    end
+
     # Checks whether the policy is valid
     #
     # @return [Boolean]

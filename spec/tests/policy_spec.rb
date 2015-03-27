@@ -18,6 +18,29 @@ describe Attestor::Policy do
 
   describe ".new" do
 
+    let(:build) { described_class.new(:foo) { attr_reader :bar } }
+    subject     { build.new(:baz) }
+
+    it "builds the struct" do
+      expect(subject).to be_kind_of Struct
+    end
+
+    it "adds given attributes" do
+      expect(subject.foo).to eq :baz
+    end
+
+    it "builds the policy" do
+      expect(subject).to be_kind_of described_class
+    end
+
+    it "yields the block in class scope" do
+      expect(subject).to respond_to :bar
+    end
+
+  end
+
+  describe ".included" do
+
     it "creates a validator" do
       expect(subject).to be_kind_of validator
     end
