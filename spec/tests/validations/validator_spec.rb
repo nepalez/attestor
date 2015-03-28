@@ -155,12 +155,27 @@ describe Attestor::Validations::Validator do
   describe "#validate" do
 
     let(:object) { double foo: nil }
-    subject { described_class.new :foo }
     after { subject.validate object }
 
-    it "calls validation method" do
-      expect(object).to receive :foo
-    end
+    context "when no block initialized" do
+
+      subject { described_class.new :foo }
+
+      it "calls validation method" do
+        expect(object).to receive :foo
+      end
+
+    end # context
+
+    context "when block initialized" do
+
+      subject { described_class.new(:baz) { foo } }
+
+      it "calls a block" do
+        expect(object).to receive :foo
+      end
+
+    end # context
 
   end # describe #validate
 

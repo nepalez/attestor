@@ -26,10 +26,11 @@ module Attestor
       # @return [Attestor::Validations::Validator]
 
       # @private
-      def initialize(name, except: nil, only: nil)
+      def initialize(name, except: nil, only: nil, &block)
         @name      = name.to_sym
         @whitelist = normalize(only)
         @blacklist = normalize(except)
+        @block     = block
         generate_id
         freeze
       end
@@ -68,7 +69,7 @@ module Attestor
       #
       # @return [undefined]
       def validate(object)
-        object.__send__(name)
+        block ? object.instance_eval(&block) : object.__send__(name)
       end
 
       protected
@@ -81,7 +82,7 @@ module Attestor
 
       private
 
-      attr_reader :whitelist, :blacklist
+      attr_reader :whitelist, :blacklist, :block
 
       def whitelisted?(symbol)
         whitelist.empty? || whitelist.include?(symbol)
