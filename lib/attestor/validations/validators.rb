@@ -63,12 +63,10 @@ module Attestor
         add_item Delegator, *args, &block
       end
 
-      # Returns validators updated by a new follower with given args
-      #
-      # @param  [Array] args
-      #
-      # @return [Attestor::Validators]
+      # @deprecated
       def add_follower(*args)
+        warn "[DEPRECATED] .add_follower is deprecated since v1.0.0" \
+             " Use .validates method instead."
         add_item Follower, *args
       end
 
