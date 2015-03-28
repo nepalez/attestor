@@ -100,22 +100,6 @@ module Attestor
         @validators = validators.add_delegator(*args, &block)
       end
 
-      # @!method follow_policy(name, except: nil, only: nil)
-      # Registers a followed policy
-      #
-      # Mutates the class by changing its {#validators} attribute!
-      #
-      # @param [#to_sym] name
-      # @option [#to_sym, Array<#to_sym>] :except
-      #   the black list of contexts for validation
-      # @option [#to_sym, Array<#to_sym>] :only
-      #   the white list of contexts for validation
-      #
-      # @return [Attestor::Collection] the updated collection
-      def follow_policy(*args)
-        @validators = validators.add_follower(*args)
-      end
-
     end # module ClassMethods
 
     # @private

@@ -42,7 +42,7 @@ module Attestor
       # @return [Attestor::Validators]
       def set(context)
         validators = select { |item| item.used_in_context? context }
-        
+
         self.class.new(validators)
       end
 
@@ -64,20 +64,12 @@ module Attestor
         add_item Delegator, *args, &block
       end
 
-      # @deprecated
-      def add_follower(*args)
-        warn "[DEPRECATED] .add_follower is deprecated since v1.0.0" \
-             " Use .validates method instead."
-        add_item Follower, *args
-      end
-
       private
 
       attr_reader :items
 
       def add_item(type, *args, &block)
-        item = type.new(*args, &block)
-        include?(item) ? self : self.class.new(items, item)
+        self.class.new items, type.new(*args, &block)
       end
 
     end # class Validators
