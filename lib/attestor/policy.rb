@@ -31,7 +31,7 @@ module Attestor
     # @return [Class] the policy class, based on Struct
     def self.new(*attributes, &block)
       Struct.new(*attributes) do
-        include Attestor::Policy
+        include Policy
         instance_eval(&block) if block_given?
       end
     end

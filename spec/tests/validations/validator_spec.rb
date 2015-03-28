@@ -46,6 +46,10 @@ describe Attestor::Validations::Validator do
       expect(subject.name).to eq :foo
     end
 
+    it "is initialized by default as :invalid" do
+      expect(described_class.new.name).to eq :invalid
+    end
+
   end # describe .name
 
   describe "#==" do
@@ -154,8 +158,8 @@ describe Attestor::Validations::Validator do
 
   describe "#validate" do
 
-    let(:object) { double foo: nil }
-    after { subject.validate object }
+    let(:object) { Class.new { private def foo; end }.new }
+    after        { subject.validate object }
 
     context "when no block initialized" do
 

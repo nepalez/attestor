@@ -25,7 +25,7 @@ module Attestor
       #
       # @return [undefined]
       def validate
-        return if any_valid?
+        return if detect(&:valid?)
         super
       end
 

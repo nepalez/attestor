@@ -42,7 +42,8 @@ module Attestor
       # @return [Attestor::Validators]
       def set(context)
         validators = select { |item| item.used_in_context? context }
-        (validators == items) ? self : self.class.new(validators)
+        
+        self.class.new(validators)
       end
 
       # Returns validators updated by a new validator with given args

@@ -12,32 +12,36 @@ describe Attestor::Policy do
   after   { Object.send :remove_const, :Test }
   subject { test_class.new }
 
-  it "is a factory" do
-    expect(test_class).to be_kind_of factory
-  end
+  describe ".included" do
+
+    it "is a factory" do
+      expect(test_class).to be_kind_of factory
+    end
+
+  end # describe .included
 
   describe ".new" do
 
-    let(:build) { described_class.new(:foo) { attr_reader :bar } }
-    subject     { build.new(:baz) }
+    subject { described_class.new(:foo) }
 
     it "builds the struct" do
-      expect(subject).to be_kind_of Struct
+      expect(subject.new(:baz)).to be_kind_of Struct
     end
 
     it "adds given attributes" do
-      expect(subject.foo).to eq :baz
+      expect(subject.new(:baz).foo).to eq :baz
     end
 
     it "builds the policy" do
-      expect(subject).to be_kind_of described_class
+      expect(subject.new(:baz)).to be_kind_of described_class
     end
 
     it "yields the block in class scope" do
-      expect(subject).to respond_to :bar
+      subject = described_class.new(:foo) { attr_reader :bar }
+      expect(subject.new(:baz)).to respond_to :bar
     end
 
-  end
+  end # describe .new
 
   describe ".included" do
 

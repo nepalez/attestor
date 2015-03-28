@@ -22,7 +22,7 @@ module Attestor
       # @raise [Attestor::InvalidError] if a policy isn't valid
       #
       # @return [undefined]
-      def validate(object)
+      def validate(_)
         super.validate
       end
 

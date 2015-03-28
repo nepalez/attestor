@@ -11,6 +11,10 @@ describe Attestor::Policy::Node do
       expect(subject).to be_kind_of policy_class
     end
 
+    it "creates a collection" do
+      expect(subject).to be_kind_of Enumerable
+    end
+
     it "creates immutable object" do
       expect(subject).to be_frozen
     end
@@ -33,10 +37,35 @@ describe Attestor::Policy::Node do
 
   end # describe #branches
 
+  describe "#each" do
+
+    let(:branches) { 3.times.map { double } }
+
+    it "returns an enumerator" do
+      expect(subject.each).to be_kind_of Enumerator
+    end
+
+    it "iterates through brances" do
+      subject = described_class.new(branches)
+      expect(subject.to_a).to eq branches
+    end
+
+  end # each
+
   describe "#validate" do
+
+    let(:message) { Attestor::Validations::Message.new :base, subject }
 
     it "raises InvalidError" do
       expect { subject.validate }.to raise_error invalid_error
+    end
+
+    it "adds the :invalid message" do
+      begin
+        subject.validate
+      rescue => error
+        expect(error.messages).to contain_exactly message
+      end
     end
 
   end # describe #validate

@@ -148,7 +148,7 @@ describe Attestor::Validations::Validators do
 
     subject do
       described_class.new
-        .add_validator("foo", only:   %w(cad cam))
+        .add_validator("foo")
         .add_validator("bar", except: %w(cad))
         .add_validator("baz", except: %w(cam))
     end
@@ -160,7 +160,7 @@ describe Attestor::Validations::Validators do
     it "returns a set of items used in given context" do
       expect(subject.set("cad").map(&:name)).to contain_exactly :foo, :baz
       expect(subject.set("cam").map(&:name)).to contain_exactly :foo, :bar
-      expect(subject.set("all").map(&:name)).to contain_exactly :bar, :baz
+      expect(subject.set("all").map(&:name)).to contain_exactly :foo, :bar, :baz
     end
 
   end # describe #set

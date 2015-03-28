@@ -9,6 +9,7 @@ module Attestor
     # @api private
     class Node
       include Attestor::Policy
+      include Enumerable
 
       # @!scope class
       # @!method new(*branches)
@@ -41,14 +42,11 @@ module Attestor
         invalid :base
       end
 
-      private
-
-      def any_valid?
-        branches.detect(&:valid?)
-      end
-
-      def any_invalid?
-        branches.detect(&:invalid?)
+      # Iterates throught branches
+      #
+      # @return [Enumerator]
+      def each
+        block_given? ? branches.each { |item| yield(item) } : to_enum
       end
 
     end # class Node

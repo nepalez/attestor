@@ -26,7 +26,7 @@ module Attestor
       # @return [Attestor::Validations::Validator]
 
       # @private
-      def initialize(name = "", except: nil, only: nil, &block)
+      def initialize(name = :invalid, except: nil, only: nil, &block)
         @name      = name.to_sym
         @whitelist = normalize(only)
         @blacklist = normalize(except)
