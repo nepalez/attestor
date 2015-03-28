@@ -3,7 +3,7 @@
 describe Attestor::Validations::Validators do
 
   let(:validator_class) { Attestor::Validations::Validator }
-  let(:follower_class)  { Attestor::Validations::Follower  }
+  let(:delegator_class) { Attestor::Validations::Delegator  }
 
   describe ".new" do
 
@@ -34,7 +34,7 @@ describe Attestor::Validations::Validators do
 
   describe "#add_validator" do
 
-    context "without contexts" do
+    context "with a name" do
 
       let(:result) { subject.add_validator "foo" }
 
@@ -42,10 +42,10 @@ describe Attestor::Validations::Validators do
         expect(result).to be_kind_of described_class
       end
 
-      it "adds validator (not a follower)" do
+      it "adds validator (not a delegator)" do
         item = result.first
         expect(item).to be_kind_of validator_class
-        expect(item).not_to be_kind_of follower_class
+        expect(item).not_to be_kind_of delegator_class
       end
 
       it "assigns a name" do
@@ -54,8 +54,23 @@ describe Attestor::Validations::Validators do
       end
 
       it "preserves existing items" do
-        expect(result.add_validator(:bar).map(&:name))
-          .to contain_exactly :foo, :bar
+        expect(result.add_validator(:bar).count).to be 2
+      end
+
+    end # context
+
+    context "with a block" do
+
+      let(:result) { subject.add_validator { foo } }
+
+      it "returns validators" do
+        expect(result).to be_kind_of described_class
+      end
+
+      it "adds validator (not a delegator)" do
+        item = result.first
+        expect(item).to be_kind_of validator_class
+        expect(item).not_to be_kind_of delegator_class
       end
 
     end # context
@@ -72,31 +87,21 @@ describe Attestor::Validations::Validators do
 
     end # context
 
-    context "existing validator" do
-
-      subject { described_class.new.add_validator "foo" }
-
-      it "returns itself" do
-        expect(subject.add_validator "foo").to eq subject
-      end
-
-    end # context
-
   end # describe #add_validator
 
-  describe "#add_follower" do
+  describe "#add_delegator" do
 
-    context "without contexts" do
+    context "with a name" do
 
-      let(:result) { subject.add_follower "foo" }
+      let(:result) { subject.add_delegator "foo" }
 
       it "returns validators" do
         expect(result).to be_kind_of described_class
       end
 
-      it "adds a follower" do
+      it "adds a delegator" do
         item = result.first
-        expect(item).to be_kind_of follower_class
+        expect(item).to be_kind_of delegator_class
       end
 
       it "assigns a name" do
@@ -105,15 +110,29 @@ describe Attestor::Validations::Validators do
       end
 
       it "preserves existing items" do
-        expect(result.add_follower(:bar).map(&:name))
-          .to contain_exactly :foo, :bar
+        expect(result.add_delegator(:bar).count).to eq 2
+      end
+
+    end # context
+
+    context "with a block" do
+
+      let(:result) { subject.add_delegator { foo } }
+
+      it "returns validators" do
+        expect(result).to be_kind_of described_class
+      end
+
+      it "adds a delegator" do
+        item = result.first
+        expect(item).to be_kind_of delegator_class
       end
 
     end # context
 
     context "with contexts" do
 
-      let(:result) { subject.add_follower "foo", only: [:foo] }
+      let(:result) { subject.add_delegator "foo", only: [:foo] }
 
       it "adds item to validators" do
         expect(result.map(&:name)).to eq [:foo]
@@ -123,17 +142,7 @@ describe Attestor::Validations::Validators do
 
     end # context
 
-    context "existing validator" do
-
-      subject { described_class.new.add_follower "foo" }
-
-      it "returns itself" do
-        expect(subject.add_follower "foo").to eq subject
-      end
-
-    end # context
-
-  end # describe #add_follower
+  end # describe #add_delegator
 
   describe "#set" do
 

@@ -53,15 +53,13 @@ describe "Base example" do
     class Transfer
       include Attestor::Validations
 
-      follow_policy :consistent
-      follow_policy :limited, except: :blocked
-      follow_policy :internal,  only: :blocked
+      validates { ConsistencyPolicy.new(debet, credit) }
+      validates :limited, except: :blocked
+      validate  only: :blocked do
+        internal.validate
+      end
 
       private
-
-      def consistent
-        ConsistencyPolicy.new(debet, credit)
-      end
 
       def limited
         LimitPolicy.new(debet).or internal

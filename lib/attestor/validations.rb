@@ -51,21 +51,53 @@ module Attestor
         @validators ||= Validators.new
       end
 
-      # @!method follow_validator(name, except: nil, only: nil)
-      # Registers a validator
+      # @!method validate(name = nil, except: nil, only: nil, &block)
+      # Uses an instance method or block for validation
       #
       # Mutates the class by changing its {#validators} attribute!
       #
-      # @param [#to_sym] name
-      # @param [Hash] options
       # @option options [#to_sym, Array<#to_sym>] :except
       #   the black list of contexts for validation
       # @option options [#to_sym, Array<#to_sym>] :only
       #   the white list of contexts for validation
       #
-      # @return [Attestor::Validators] the updated collection
-      def validate(*args)
-        @validators = validators.add_validator(*args)
+      # @overload validate(name, except: nil, only: nil)
+      #   Uses the instance method for validation
+      #
+      #   @param [#to_sym] name The name of the instance method
+      #
+      # @overload validate(except: nil, only: nil, &block)
+      #   Uses the block (in the scope of the instance) for validation
+      #
+      #   @param [Proc] block
+      #
+      # @return [Attestor::Validators] the updated list of validators
+      def validate(*args, &block)
+        @validators = validators.add_validator(*args, &block)
+      end
+
+      # @!method validates(name = nil, except: nil, only: nil, &block)
+      # Delegates a validation to instance method or block
+      #
+      # Mutates the class by changing its {#validators} attribute!
+      #
+      # @option (see #validate)
+      #
+      # @overload validates(name, except: nil, only: nil)
+      #   Delegates a validation to instance method
+      #
+      #   @param [#to_sym] name
+      #     The name of the instance method that should respond to #validate
+      #
+      # @overload validates(except: nil, only: nil, &block)
+      #   Uses the block (in the scope of the instance) for validation
+      #
+      #   @param [Proc] block
+      #     The block that should respond to #validate
+      #
+      # @return (see #validate)
+      def validates(*args, &block)
+        @validators = validators.add_delegator(*args, &block)
       end
 
       # @!method follow_policy(name, except: nil, only: nil)

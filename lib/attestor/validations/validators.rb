@@ -50,8 +50,17 @@ module Attestor
       # @param  [Array] args
       #
       # @return [Attestor::Validators]
-      def add_validator(*args)
-        add_item Validator, *args
+      def add_validator(*args, &block)
+        add_item Validator, *args, &block
+      end
+
+      # Returns validators updated by a new validator with given args
+      #
+      # @param  [Array] args
+      #
+      # @return [Attestor::Validators]
+      def add_delegator(*args, &block)
+        add_item Delegator, *args, &block
       end
 
       # Returns validators updated by a new follower with given args
@@ -67,8 +76,8 @@ module Attestor
 
       attr_reader :items
 
-      def add_item(type, *args)
-        item = type.new(*args)
+      def add_item(type, *args, &block)
+        item = type.new(*args, &block)
         include?(item) ? self : self.class.new(items, item)
       end
 

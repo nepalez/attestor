@@ -3,11 +3,11 @@
 # Definitions for testing compound policies
 
 def valid_policy
-  double valid?: true, invalid?: false
+  double valid?: true, invalid?: false, validate: nil
 end
 
 def invalid_policy
-  double valid?: false, invalid?: true
+  double valid?: false, invalid?: true, validate: nil
 end
 
 shared_examples "creating a node" do

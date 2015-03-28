@@ -6,15 +6,14 @@ describe Attestor::Validations do
 
   let(:validators_class) { Attestor::Validations::Validators }
   let(:validator_class)  { Attestor::Validations::Validator  }
-  let(:follower_class)   { Attestor::Validations::Follower   }
-  let(:collection_class) { Attestor::Validations::Validators }
+  let(:delegator_class)  { Attestor::Validations::Delegator  }
   let(:item_class)       { Attestor::Validations::Item       }
   let(:message_class)    { Attestor::Validations::Message    }
   let(:invalid_error)    { Attestor::InvalidError            }
 
   let(:test_class) { Class.new.send(:include, described_class) }
-  before { Test = test_class                }
-  after  { Object.send :remove_const, :Test }
+  before           { Test = test_class                         }
+  after            { Object.send :remove_const, :Test          }
 
   subject { test_class.new }
 
@@ -38,7 +37,7 @@ describe Attestor::Validations do
 
       it "registers a validator" do
         expect(test_class.validators.map(&:name)).to eq [:foo]
-        expect(test_class.validators.first).not_to be_kind_of follower_class
+        expect(test_class.validators.first).not_to be_kind_of delegator_class
       end
 
     end # context
@@ -57,22 +56,22 @@ describe Attestor::Validations do
 
   end # describe .validate
 
-  describe ".follow_policy" do
+  describe ".validates" do
 
     context "without options" do
 
-      before { test_class.follow_policy :foo }
+      before { test_class.validates :foo }
 
-      it "registers a follower" do
+      it "registers a delegator" do
         expect(test_class.validators.map(&:name)).to eq [:foo]
-        expect(test_class.validators.first).to be_kind_of follower_class
+        expect(test_class.validators.first).to be_kind_of delegator_class
       end
 
     end # context
 
     context "with restrictions" do
 
-      before { test_class.follow_policy :foo, only: %w(bar baz), except: "bar" }
+      before { test_class.validates :foo, only: %w(bar baz), except: "bar" }
 
       it "uses options" do
         expect(test_class.validators.map(&:name)).to eq [:foo]
@@ -82,7 +81,7 @@ describe Attestor::Validations do
 
     end # context
 
-  end # describe .follow_policy
+  end # describe .validates
 
   describe "#invalid" do
 
@@ -126,9 +125,9 @@ describe Attestor::Validations do
   describe "#validate" do
 
     before do
-      test_class.validate :foo
-      test_class.validate :bar, only: :all
-      test_class.follow_policy :baz, only: :foo
+      test_class.validate  :foo
+      test_class.validate  :bar, only: :all
+      test_class.validates :baz, only: :foo
 
       allow(subject).to receive(:foo)
       allow(subject).to receive(:bar)
