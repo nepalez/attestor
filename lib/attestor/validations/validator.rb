@@ -7,7 +7,7 @@ module Attestor
     # Describe a validator for class instances
     #
     # @example
-    #   validator = Validator.new(:foo, policy: :bar, only: :baz)
+    #   validator = Validator.new(:foo, only: :baz)
     #
     #   validator.used_in_context? :baz # => true
     #   validator.validate object
@@ -26,9 +26,8 @@ module Attestor
       # @return [Attestor::Validations::Validator]
 
       # @private
-      def initialize(name, except: nil, only: nil, policy: nil)
+      def initialize(name, except: nil, only: nil)
         @name      = name.to_sym
-        @policy    = policy
         @whitelist = normalize(only)
         @blacklist = normalize(except)
         generate_id
@@ -40,14 +39,6 @@ module Attestor
       #
       # @return [Symbol]
       attr_reader :name
-
-      # @!method policy?
-      # Whether the validator uses a policy
-      #
-      # @return [Boolean]
-      def policy?
-        @policy ? true : false
-      end
 
       # Compares an item to another one
       #
@@ -77,8 +68,7 @@ module Attestor
       #
       # @return [undefined]
       def validate(object)
-        result = object.__send__(name)
-        object.__send__(:invalid, name) if policy? && result.invalid?
+        object.__send__(name)
       end
 
       protected

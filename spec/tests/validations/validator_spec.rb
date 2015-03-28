@@ -38,10 +38,6 @@ describe Attestor::Validations::Validator do
         .to eq(described_class.new "foo", only: %i(bar))
     end
 
-    it "accepts array option :policy" do
-      expect { described_class.new "foo", policy: :bar }.not_to raise_error
-    end
-
   end # describe .new
 
   describe "#name" do
@@ -51,19 +47,6 @@ describe Attestor::Validations::Validator do
     end
 
   end # describe .name
-
-  describe "#policy?" do
-
-    it "is set to false by default" do
-      expect(subject.policy?).to eq false
-    end
-
-    it "can be initialized" do
-      subject = described_class.new "foo", policy: 1
-      expect(subject.policy?).to eq true
-    end
-
-  end # describe #policy?
 
   describe "#==" do
 
@@ -171,48 +154,13 @@ describe Attestor::Validations::Validator do
 
   describe "#validate" do
 
+    let(:object) { double foo: nil }
+    subject { described_class.new :foo }
     after { subject.validate object }
 
-    context "when a #policy isn't set" do
-
-      let(:object) { double foo: nil }
-      subject { described_class.new :foo }
-
-      it "calls validation method" do
-        expect(object).to receive :foo
-      end
-
-    end # context
-
-    context "when a #policy is set to valid policy" do
-
-      let(:object) { double foo: valid_policy }
-      subject { described_class.new :foo, policy: true }
-
-      it "calls policy method" do
-        expect(object).to receive(:foo)
-      end
-
-      it "doesn't call #invalid" do
-        expect(object).not_to receive(:invalid)
-      end
-
-    end # context
-
-    context "when a #policy is set to valid policy" do
-
-      let(:object) { double foo: invalid_policy, invalid: nil }
-      subject { described_class.new :foo, policy: true }
-
-      it "calls policy method" do
-        expect(object).to receive(:foo)
-      end
-
-      it "calls #invalid with name" do
-        expect(object).to receive(:invalid).with(:foo)
-      end
-
-    end # context
+    it "calls validation method" do
+      expect(object).to receive :foo
+    end
 
   end # describe #validate
 

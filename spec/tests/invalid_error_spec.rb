@@ -48,10 +48,6 @@ describe Attestor::InvalidError do
       expect(subject.messages).to eq %w(cad cam)
     end
 
-    it "is immutable" do
-      expect(subject.messages).to be_frozen
-    end
-
   end # describe #messages
 
 end # describe Attestor::ValidError

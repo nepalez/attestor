@@ -36,7 +36,7 @@ module Attestor
     #     the name converted to string
     def invalid(name, options = {})
       message = Message.new(name, self, options)
-      fail InvalidError.new self, [message]
+      fail InvalidError.new self, message
     end
 
     # @private
@@ -51,6 +51,7 @@ module Attestor
         @validators ||= Validators.new
       end
 
+      # @!method follow_validator(name, except: nil, only: nil)
       # Registers a validator
       #
       # Mutates the class by changing its {#validators} attribute!
@@ -63,24 +64,24 @@ module Attestor
       #   the white list of contexts for validation
       #
       # @return [Attestor::Validators] the updated collection
-      def validate(name, options = {})
-        @validators = validators.add(name, options)
+      def validate(*args)
+        @validators = validators.add_validator(*args)
       end
 
+      # @!method follow_policy(name, except: nil, only: nil)
       # Registers a followed policy
       #
       # Mutates the class by changing its {#validators} attribute!
       #
       # @param [#to_sym] name
-      # @param [Hash] options
-      # @option options [#to_sym, Array<#to_sym>] :except
+      # @option [#to_sym, Array<#to_sym>] :except
       #   the black list of contexts for validation
-      # @option options [#to_sym, Array<#to_sym>] :only
+      # @option [#to_sym, Array<#to_sym>] :only
       #   the white list of contexts for validation
       #
       # @return [Attestor::Collection] the updated collection
-      def follow_policy(name, options = {})
-        @validators = validators.add(name, options.merge(policy: true))
+      def follow_policy(*args)
+        @validators = validators.add_follower(*args)
       end
 
     end # module ClassMethods

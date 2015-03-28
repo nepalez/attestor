@@ -19,8 +19,8 @@ module Attestor
       # @return [Attestor::Validators]
 
       # @private
-      def initialize(items = [])
-        @items = items
+      def initialize(*items)
+        @items = items.flatten
         freeze
       end
 
@@ -32,23 +32,7 @@ module Attestor
       #
       # @return [Enumerator]
       def each
-        block_given? ? @items.each { |item| yield(item) } : to_enum
-      end
-
-      # Returns validators updated by new item
-      #
-      # @param  [#to_sym] name
-      # @param  [Hash] options
-      # @option options [Array<#to_sym>] :except
-      # @option options [Array<#to_sym>] :only
-      # @option options [Symbol, nil] :policy
-      #
-      # @return [Attestor::Validators]
-      def add(name, options = {})
-        item = Validator.new(name, options)
-        return self if include? item
-
-        self.class.new(@items + [item])
+        block_given? ? items.each { |item| yield(item) } : to_enum
       end
 
       # Returns validators used in given context
@@ -58,13 +42,35 @@ module Attestor
       # @return [Attestor::Validators]
       def set(context)
         validators = select { |item| item.used_in_context? context }
+        (validators == items) ? self : self.class.new(validators)
+      end
 
-        self.class.new(validators)
+      # Returns validators updated by a new validator with given args
+      #
+      # @param  [Array] args
+      #
+      # @return [Attestor::Validators]
+      def add_validator(*args)
+        add_item Validator, *args
+      end
+
+      # Returns validators updated by a new follower with given args
+      #
+      # @param  [Array] args
+      #
+      # @return [Attestor::Validators]
+      def add_follower(*args)
+        add_item Follower, *args
       end
 
       private
 
       attr_reader :items
+
+      def add_item(type, *args)
+        item = type.new(*args)
+        include?(item) ? self : self.class.new(items, item)
+      end
 
     end # class Validators
 

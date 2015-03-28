@@ -16,20 +16,19 @@ module Attestor
       end
     end
 
-    # Builds the policy class
+    # Builds a policy class with given attributes
     #
     # @example
     #   MyPolicy = Attestor::Policy.new(:foo, :bar) do
     #     attr_reader :baz
     #   end
     #
-    # @attribute [Array<#to_sym>] attributes
-    #   the list of attributes
-    # @attribute [Proc] block
+    # @param [Array<#to_sym>] attributes
+    # @param [Proc] block
     #
     # @yield the block in the scope of created class
     #
-    # @return [Class]
+    # @return [Class] the policy class, based on Struct
     def self.new(*attributes, &block)
       Struct.new(*attributes) do
         include Attestor::Policy

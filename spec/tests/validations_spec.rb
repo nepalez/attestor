@@ -5,14 +5,15 @@ require "support/policies" # for #valid_policy and #invalid_policy definitions
 describe Attestor::Validations do
 
   let(:validators_class) { Attestor::Validations::Validators }
-  let(:validator_class)  { Attestor::Validations::Validator }
+  let(:validator_class)  { Attestor::Validations::Validator  }
+  let(:follower_class)   { Attestor::Validations::Follower   }
   let(:collection_class) { Attestor::Validations::Validators }
-  let(:item_class)       { Attestor::Validations::Item }
-  let(:message_class)    { Attestor::Validations::Message }
-  let(:invalid_error)    { Attestor::InvalidError }
-  let(:test_class)       { Class.new.send(:include, described_class) }
+  let(:item_class)       { Attestor::Validations::Item       }
+  let(:message_class)    { Attestor::Validations::Message    }
+  let(:invalid_error)    { Attestor::InvalidError            }
 
-  before { Test = test_class }
+  let(:test_class) { Class.new.send(:include, described_class) }
+  before { Test = test_class                }
   after  { Object.send :remove_const, :Test }
 
   subject { test_class.new }
@@ -37,10 +38,7 @@ describe Attestor::Validations do
 
       it "registers a validator" do
         expect(test_class.validators.map(&:name)).to eq [:foo]
-      end
-
-      it "sets a validator's policy to false" do
-        expect(test_class.validators.first).not_to be_policy
+        expect(test_class.validators.first).not_to be_kind_of follower_class
       end
 
     end # context
@@ -65,12 +63,9 @@ describe Attestor::Validations do
 
       before { test_class.follow_policy :foo }
 
-      it "registers a validator" do
+      it "registers a follower" do
         expect(test_class.validators.map(&:name)).to eq [:foo]
-      end
-
-      it "sets a validator's policy to true" do
-        expect(test_class.validators.first).to be_policy
+        expect(test_class.validators.first).to be_kind_of follower_class
       end
 
     end # context
