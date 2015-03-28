@@ -106,7 +106,7 @@ Alternatively, you can describe validation in the block (called in the scope of 
 ```ruby
 class Transfer
   # ...
-  validate(:consistent) { invalid :inconsistent if credit.sum != debet.sum }
+  validate { invalid :inconsistent if credit.sum != debet.sum }
 end
 ```
 
@@ -161,10 +161,50 @@ class Transfer
 end
 ```
 
+Delegation
+----------
+
+Extract validator to the external object (policy), that responds to `validate`.
+
+```ruby
+class ConsistentTransfer.new(:debet, :credit)
+  include Attestor::Validations
+
+  def validate
+    invalid :inconsistent unless debet.sum == credit.sum
+  end
+end
+```
+
+Then use `validates` helper:
+
+```ruby
+class Transfer 
+  # ...
+  validates { ConsistentTransfer.new(:debet, :credit) }
+end
+```
+
+or by method name:
+
+```ruby
+class Transfer
+  # ...
+  validates :consistent_transfer
+
+  def consistent_transfer
+    ConsistentTransfer.new(:debet, :credit)
+  end
+```
+
+The change between `validate :something` and `validates :something` is that:
+* `validate` expects `#something` to make checks and raise error by itself
+* `validates` expects `#something` to respond to `#validate`
+
 Policy Objects
 --------------
 
-Extract a validator to the separate object (policy). Basically the policy includes `Attestor::Validations` with additional methods.
+Basically the policy includes `Attestor::Validations` with additional methods to allow chaining policies by logical methods.
 
 To create a policy as a `Struct` use the builder method:
 
@@ -177,55 +217,30 @@ ConsistencyPolicy = Attestor::Policy.new(:debet, :credit) do
 end
 ```
 
-This looks mainly the same as before. But the policy's debet and credit are numbers, not the transactions. **The policy knows nothing about the nature of its attributes** - whether they are sums of transactions, or anything else.
-
-This is the core part of the [Policy Object design pattern] - it isolates the rule from unsignificant details of the target.
-
-When you have a policy to follow, use the `follow_policy` method:
+If you doesn't need Struct, include `Attestor::Policy` to the class and initialize its arguments somehow else:
 
 ```ruby
-class Transfer < Struct.new(:debet, :credit)
-  include Attestor::Validations
-
-  follow_policy :consistency, only: :fair_trade
-
-  private
-
-  def consistency # should respond to #valid? and #invalid?
-    ConsistencyPolicy.new(debet.sum, credit.sum)
-  end
+class ConsistencyPolicy < OpenStruct
+  include Attestor::Policy
+  # ...
 end
 ```
 
-In case the policy object is invalid, validation raises an exception.
-
-The name of the method (`consistency`) will be used for the error message:
-
-```yaml
-# config/locales/en.yml
----
-en:
-  attestor:
-    errors:
-      transfer:
-        consistency: "The transfer is inconsistent"
-```
-
-Alternatively, you can describe a policy in the block (called in the scope of instance):
+Policy objects can be used by `validates` method like other validatable objects:
 
 ```ruby
 class Transfer
   # ...
-  follow_policy :consistency, only: :fair_trade do
-    ConsistencyPolicy.new(debet.sum, credit.sum)
-  end
+  validates { ConsistencyPolicy.new(debet, credit) }
 end
 ```
+
+They also respond to `valid?` and `invalid?` methods (that just rescues from `vaidate` missing any error messages).
 
 Complex Policies
 ----------------
 
-Now that policies are isolated from their targets, we can provide complex policies from simpler ones.
+Policies (assertions) can be combined by logical methods.
 
 Suppose we have two policy objects:
 
