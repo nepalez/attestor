@@ -101,6 +101,15 @@ en:
         inconsistent: "Credit differs from debet by %{fraud}"
 ```
 
+Alternatively, you can describe validation in the block (called in the scope of instance):
+
+```ruby
+class Transfer
+  # ...
+  validate(:consistent) { invalid :inconsistent if credit.sum != debet.sum }
+end
+```
+
 To run validations use the `#validate` instance method:
 
 ```ruby
@@ -200,6 +209,17 @@ en:
     errors:
       transfer:
         consistency: "The transfer is inconsistent"
+```
+
+Alternatively, you can describe a policy in the block (called in the scope of instance):
+
+```ruby
+class Transfer
+  # ...
+  follow_policy :consistency, only: :fair_trade do
+    ConsistencyPolicy.new(debet.sum, credit.sum)
+  end
+end
 ```
 
 Complex Policies
