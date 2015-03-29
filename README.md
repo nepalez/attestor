@@ -71,14 +71,6 @@ class Transfer < Struct.new(:debet, :credit)
   include Attestor::Validations
 
   validate :consistent
-end
-```
-
-You have to define an instance validator method (that can be private):
-
-```ruby
-class Transfer < Struct.new(:debet, :credit)
-  # ...
 
   private
 
@@ -89,7 +81,16 @@ class Transfer < Struct.new(:debet, :credit)
 end
 ```
 
-The `#invalid` method translates its argument in a current class scope and raises an exception.
+Alternatively, you can describe validation in the block (called in the scope of instance):
+
+```ruby
+class Transfer
+  # ...
+  validate { invalid :inconsistent if credit.sum != debet.sum }
+end
+```
+
+The `#invalid` method translates its argument in a current class scope and raises an exception with that method.
 
 ```yaml
 # config/locales/en.yml
@@ -99,15 +100,6 @@ en:
     errors:
       transfer:
         inconsistent: "Credit differs from debet by %{fraud}"
-```
-
-Alternatively, you can describe validation in the block (called in the scope of instance):
-
-```ruby
-class Transfer
-  # ...
-  validate { invalid :inconsistent if credit.sum != debet.sum }
-end
 ```
 
 To run validations use the `#validate` instance method:
@@ -148,16 +140,16 @@ fraud_transfer.validate                 # => InvalidError
 fraud_transfer.validate :steal_of_money # => PASSES!
 ```
 
-You can use the same validator several times with different contexts. Any validation will be made independently from the others:
+You can use the same validator several times with different contexts.
 
 ```ruby
 class Transfer
   # ...
+
+  # validate :consistent, only: [:fair_trade, :legal]
   validate :consistent, only: :fair_trade
   validate :consistent, only: :legal
 
-  # This is the same as:
-  # validate :consistent, only: [:fair_trade, :legal]
 end
 ```
 
@@ -197,14 +189,14 @@ class Transfer
   end
 ```
 
-The change between `validate :something` and `validates :something` is that:
+The difference between `validate :something` and `validates :something` is that:
 * `validate` expects `#something` to make checks and raise error by itself
 * `validates` expects `#something` to respond to `#validate`
 
 Policy Objects
 --------------
 
-Basically the policy includes `Attestor::Validations` with additional methods to allow chaining policies by logical methods.
+Basically the policy includes `Attestor::Validations` with additional methods to allow logical compositions.
 
 To create a policy as a `Struct` use the builder method:
 
@@ -226,7 +218,7 @@ class ConsistencyPolicy < OpenStruct
 end
 ```
 
-Policy objects can be used by `validates` method like other validatable objects:
+Policy objects can be used by `validates` method like other objects that respond to `#validate`:
 
 ```ruby
 class Transfer
@@ -235,7 +227,7 @@ class Transfer
 end
 ```
 
-They also respond to `valid?` and `invalid?` methods (that just rescues from `vaidate` missing any error messages).
+They also respond to `valid?` and `invalid?` methods (that rescue from `vaidate` missing any error messages).
 
 Complex Policies
 ----------------
