@@ -37,7 +37,9 @@ To solve the problem, the `attestor` gem:
 Approach
 --------
 
-Instead of collecting errors inside the object, the module's `validate` instance method just raises an exception (`Attestor::InvalidError`), that carries errors outside of the object. The object stays untouched (and can be made immutable).
+Instead of collecting errors inside the object, the module's `validate` instance method raises an exception (`Attestor::InvalidError`), that carries errors outside of the object.
+
+The object stays untouched (and can be made immutable).
 
 Installation
 ------------
@@ -67,7 +69,7 @@ Basic Use
 Declare validation in the same way as ActiveModel's `.validate` method does:
 
 ```ruby
-class Transfer < Struct.new(:debet, :credit)
+Transfer = Struct.new(:debet, :credit) do
   include Attestor::Validations
 
   validate :consistent
@@ -111,10 +113,9 @@ fraud_transfer = Transfer.new(debet, credit)
 
 begin
   transfer.validate
-rescue => error
+rescue Attestor::InvalidError => error
   error.object == transfer # => true
-  error.messages
-  # => ["Credit differs from debet by 10"]
+  error.messages           # => ["Credit differs from debet by 10"]
 end
 ```
 
@@ -126,9 +127,8 @@ Sometimes you need to validate the object agaist the subset of validations, not 
 To do this use `:except` and `:only` options of the `.validate` class method.
 
 ```ruby
-class Transfer < Struct.new(:debet, :credit)
-  include Attestor::Validations
-
+class Transfer
+  # ...
   validate :consistent, except: :steal_of_money
 end
 ```
@@ -159,7 +159,7 @@ Delegation
 Extract validator to the external object (policy), that responds to `validate`.
 
 ```ruby
-class ConsistentTransfer.new(:debet, :credit)
+ConsistentTransfer = Struct.new(:debet, :credit) do
   include Attestor::Validations
 
   def validate
@@ -198,7 +198,7 @@ Policy Objects
 
 Basically the policy includes `Attestor::Validations` with additional methods to allow logical compositions.
 
-To create a policy as a `Struct` use the builder method:
+To create a policy as a `Struct` use the builder:
 
 ```ruby
 ConsistencyPolicy = Attestor::Policy.new(:debet, :credit) do
@@ -209,10 +209,10 @@ ConsistencyPolicy = Attestor::Policy.new(:debet, :credit) do
 end
 ```
 
-If you doesn't need Struct, include `Attestor::Policy` to the class and initialize its arguments somehow else:
+If you doesn't need `Struct`, include `Attestor::Policy` to the class and initialize its arguments somehow else:
 
 ```ruby
-class ConsistencyPolicy < OpenStruct
+class ConsistencyPolicy
   include Attestor::Policy
   # ...
 end
