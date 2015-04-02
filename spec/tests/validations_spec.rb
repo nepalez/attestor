@@ -158,4 +158,40 @@ describe Attestor::Validations do
 
   end # describe #validate!
 
+  describe "#validate" do
+
+    before do
+      test_class.validate  :foo
+      test_class.validate  :bar, only: :all
+      test_class.validates :baz, only: :foo
+
+      allow(subject).to receive(:foo)
+      allow(subject).to receive(:bar)
+      allow(subject).to receive(:baz) { valid_policy }
+    end
+
+    context "without an argument" do
+
+      it "calls validators for :all context" do
+        expect(subject).to receive(:foo)
+        expect(subject).to receive(:bar)
+        expect(subject).not_to receive(:baz)
+        subject.validate
+      end
+
+    end # context
+
+    context ":foo" do
+
+      it "calls validators for :foo context" do
+        expect(subject).to receive(:foo)
+        expect(subject).to receive(:baz)
+        expect(subject).not_to receive(:bar)
+        subject.validate :foo
+      end
+
+    end # context
+
+  end # describe #validate!
+
 end # describe Attestor::Validations

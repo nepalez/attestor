@@ -4,6 +4,7 @@ require "support/policies"
 
 describe Attestor::Validations::Validator do
 
+  let(:reporter_module) { Attestor::Validations::Reporter }
   subject { described_class.new "foo" }
 
   describe ".new" do
@@ -182,5 +183,13 @@ describe Attestor::Validations::Validator do
     end # context
 
   end # describe #validate!
+
+  describe "#validate" do
+
+    it "is is imported from the Reporter" do
+      expect(described_class).to include reporter_module
+    end
+
+  end # describe #validate
 
 end # describe Attestor::Validation

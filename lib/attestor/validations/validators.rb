@@ -7,6 +7,7 @@ module Attestor
     # @private
     class Validators
       include Enumerable
+      include Reporter
 
       def initialize(*items)
         @items = items.flatten
@@ -29,9 +30,19 @@ module Attestor
         self.class.new items, Delegator.new(*args, &block)
       end
 
+      def validate!(object)
+        results = errors(object)
+        return if results.empty?
+        fail InvalidError.new object, results.map(&:messages).flatten
+      end
+
       private
 
       attr_reader :items
+
+      def errors(object)
+        items.map { |validator| validator.validate(object) }.select(&:invalid?)
+      end
 
     end # class Validators
 

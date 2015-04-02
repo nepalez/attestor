@@ -7,12 +7,23 @@ module Attestor
 
     # Calls all validators for given context
     #
+    # @param [#to_sym] context
+    #
     # @raise [Attestor::Validations::InvalidError] if validators fail
     # @raise [NoMethodError] if some of validators are not implemented
     #
     # @return [undefined]
     def validate!(context = :all)
-      self.class.validators.set(context).each { |item| item.validate!(self) }
+      self.class.validators.set(context).validate! self
+    end
+
+    # Calls all validators for given context and return validation results
+    #
+    # @param (see #validate!)
+    #
+    # @return [undefined]
+    def validate(context = :all)
+      self.class.validators.set(context).validate self
     end
 
     # Raises InvalidError with a corresponding message

@@ -6,6 +6,7 @@ module Attestor
 
     # @private
     class Validator
+      include Reporter
 
       def initialize(name = :invalid, except: nil, only: nil, &block)
         @name      = name.to_sym
