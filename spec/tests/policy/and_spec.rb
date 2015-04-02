@@ -17,7 +17,7 @@ describe Attestor::Policy::And do
 
   end # context
 
-  describe "#validate" do
+  describe "#validate!" do
 
     context "when all the parts are valid" do
 
@@ -35,6 +35,6 @@ describe Attestor::Policy::And do
 
     end # context
 
-  end # describe #validate
+  end # describe #validate!
 
 end # describe Policy::Base::Not

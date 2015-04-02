@@ -17,7 +17,7 @@ describe Attestor::Policy::Or do
 
   end # context
 
-  describe "#validate" do
+  describe "#validate!" do
 
     context "when valid part exists" do
 
@@ -35,6 +35,6 @@ describe Attestor::Policy::Or do
 
     end # context
 
-  end # describe #validate
+  end # describe #validate!
 
 end # describe Policy::Base::Not

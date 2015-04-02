@@ -37,7 +37,10 @@ To solve the problem, the `attestor` gem:
 Approach
 --------
 
-Instead of collecting errors inside the object, the module's `validate` instance method raises an exception (`Attestor::InvalidError`), that carries errors outside of the object.
+Instead of collecting errors inside the object, the module defines two instance methods:
+
+* `validate!` raises an exception (`Attestor::InvalidError`), that carries errors outside of the object.
+* `validate` - the safe version of `validate!`. It rescues an exception and returns special result object, that carries error info outside of the object.
 
 The object stays untouched (and can be made immutable).
 
@@ -104,7 +107,7 @@ en:
         inconsistent: "Credit differs from debet by %{fraud}"
 ```
 
-To run validations use the `#validate` instance method:
+To run validations use the `#validate!` instance method:
 
 ```ruby
 debet  = OpenStruct.new(sum: 100)
@@ -112,11 +115,23 @@ credit = OpenStruct.new(sum: 90)
 fraud_transfer = Transfer.new(debet, credit)
 
 begin
-  transfer.validate
+  transfer.validate!
 rescue Attestor::InvalidError => error
   error.object == transfer # => true
   error.messages           # => ["Credit differs from debet by 10"]
 end
+```
+
+Another option is to use the safe version `#validate`. It rescues from the exception and returns results as a separate object:
+
+```ruby
+result = transfer.validate!
+
+result.valid?               # => false
+result.invalid?             # => true
+result.object == transfer   # => true
+result.messages             # => ["Credit differs from debet by 10"]
+result.error                # => <Attestor::InvalidError ...>
 ```
 
 Use of Contexts
@@ -133,11 +148,11 @@ class Transfer
 end
 ```
 
-Then call a validate method with that context:
+Then call a `#validate!`/`#validate` methods with that context:
 
 ```ruby
-fraud_transfer.validate                 # => InvalidError
-fraud_transfer.validate :steal_of_money # => PASSES!
+fraud_transfer.validate!                 # => InvalidError
+fraud_transfer.validate! :steal_of_money # => PASSES!
 ```
 
 You can use the same validator several times with different contexts.
@@ -156,13 +171,13 @@ end
 Delegation
 ----------
 
-Extract validator to the external object (policy), that responds to `validate`.
+Extract validator to an external object (policy), that responds to `validate!`.
 
 ```ruby
 ConsistentTransfer = Struct.new(:debet, :credit) do
   include Attestor::Validations
 
-  def validate
+  def validate!
     invalid :inconsistent unless debet.sum == credit.sum
   end
 end
@@ -189,9 +204,9 @@ class Transfer
   end
 ```
 
-The difference between `validate :something` and `validates :something` is that:
-* `validate` expects `#something` to make checks and raise error by itself
-* `validates` expects `#something` to respond to `#validate`
+The difference between `.validate :something` and `.validates :something` class methods is that:
+* `.validate` expects `#something` to make checks and raise error by itself
+* `.validates` expects `#something` to respond to `#validate!`
 
 Policy Objects
 --------------
@@ -202,7 +217,7 @@ To create a policy as a `Struct` use the builder:
 
 ```ruby
 ConsistencyPolicy = Attestor::Policy.new(:debet, :credit) do
-  def validate
+  def validate!
     fraud = credit - debet
     invalid :inconsistent, fraud: fraud if fraud != 0
   end
@@ -218,7 +233,7 @@ class ConsistencyPolicy
 end
 ```
 
-Policy objects can be used by `validates` method like other objects that respond to `#validate`:
+Policy objects can be used by `validates` method like other objects that respond to `#validate!`:
 
 ```ruby
 class Transfer
@@ -245,19 +260,19 @@ Use factory methods to provide compositions:
 
 ```ruby
 complex_policy = valid_policy.not
-complex_policy.validate # => fails
+complex_policy.validate! # => fails
 
 complex_policy = valid_policy.and(valid_policy, invalid_policy)
-complex_policy.validate # => fails
+complex_policy.validate! # => fails
 
 complex_policy = invalid_policy.or(invalid_policy, valid_policy)
-complex_policy.validate # => passes
+complex_policy.validate! # => passes
 
 complex_policy = valid_policy.xor(valid_poicy, valid_policy)
-complex_policy.validate # => fails
+complex_policy.validate! # => fails
 
 complex_policy = valid_policy.xor(valid_poicy, invalid_policy)
-complex_policy.validate # => passes
+complex_policy.validate! # => passes
 ```
 
 The `or`, `and` and `xor` methods called without argument(s) don't provide a policy object. They return lazy composer, expecting `#not` method.

@@ -40,7 +40,7 @@ module Attestor
     #
     # @return [Boolean]
     def valid?
-      validate
+      validate!
     rescue InvalidError
       false
     else

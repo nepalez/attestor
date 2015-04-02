@@ -53,9 +53,9 @@ describe Attestor::Policy do
 
   describe "#valid?" do
 
-    context "when #validate method fails" do
+    context "when #validate! method fails" do
 
-      before { allow(subject).to receive(:validate) { fail invalid } }
+      before { allow(subject).to receive(:validate!) { fail invalid } }
 
       it "returns false" do
         expect(subject.valid?).to eq false
@@ -63,9 +63,9 @@ describe Attestor::Policy do
 
     end
 
-    context "when #validate method passes" do
+    context "when #validate! method passes" do
 
-      before { allow(subject).to receive(:validate) { nil } }
+      before { allow(subject).to receive(:validate!) { nil } }
 
       it "returns true" do
         expect(subject.valid?).to eq true
@@ -77,9 +77,9 @@ describe Attestor::Policy do
 
   describe "#invalid?" do
 
-    context "when #validate method fails" do
+    context "when #validate! method fails" do
 
-      before { allow(subject).to receive(:validate) { fail invalid } }
+      before { allow(subject).to receive(:validate!) { fail invalid } }
 
       it "returns true" do
         expect(subject.invalid?).to eq true
@@ -87,9 +87,9 @@ describe Attestor::Policy do
 
     end
 
-    context "when #validate method passes" do
+    context "when #validate! method passes" do
 
-      before { allow(subject).to receive(:validate) { nil } }
+      before { allow(subject).to receive(:validate!) { nil } }
 
       it "returns false" do
         expect(subject.invalid?).to eq false

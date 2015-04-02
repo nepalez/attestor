@@ -52,22 +52,22 @@ describe Attestor::Policy::Node do
 
   end # each
 
-  describe "#validate" do
+  describe "#validate!" do
 
     let(:message) { Attestor::Validations::Message.new :base, subject }
 
     it "raises InvalidError" do
-      expect { subject.validate }.to raise_error invalid_error
+      expect { subject.validate! }.to raise_error invalid_error
     end
 
     it "adds the :invalid message" do
       begin
-        subject.validate
+        subject.validate!
       rescue => error
         expect(error.messages).to contain_exactly message
       end
     end
 
-  end # describe #validate
+  end # describe #validate!
 
 end # describe Attestor::Policy::Node

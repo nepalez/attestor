@@ -4,24 +4,9 @@ module Attestor
 
   module Validations
 
-    # Bulder for error messages
-    #
-    # @api private
+    # @private
     class Message < String
 
-      # @!scope class
-      # @!method new(value, object, options = {})
-      # Builds a string from value
-      #
-      # @param [#to_s] value
-      # @param [Object] object
-      # @param [Hash] options
-      #   options for translating symbolic value
-      #
-      # @return [String]
-      #   either translation of symbolic value or stringified value argument
-
-      # @private
       def initialize(value, object, options = {})
         @value   = value
         @object  = object

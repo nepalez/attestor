@@ -11,8 +11,8 @@ module Attestor
     # @raise [NoMethodError] if some of validators are not implemented
     #
     # @return [undefined]
-    def validate(context = :all)
-      self.class.validators.set(context).each { |item| item.validate(self) }
+    def validate!(context = :all)
+      self.class.validators.set(context).each { |item| item.validate!(self) }
     end
 
     # Raises InvalidError with a corresponding message

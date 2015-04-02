@@ -56,7 +56,7 @@ describe "Base example" do
       validates { ConsistencyPolicy.new(debet, credit) }
       validates :limited, except: :blocked
       validate  only: :blocked do
-        internal.validate
+        internal.validate!
       end
 
       private
@@ -87,11 +87,11 @@ describe "Base example" do
   end
 
   it "works fine" do
-    expect { a_to_a.validate }.not_to raise_error
-    expect { b_to_a.validate }.not_to raise_error
+    expect { a_to_a.validate! }.not_to raise_error
+    expect { b_to_a.validate! }.not_to raise_error
 
-    expect { a_to_b.validate }.to raise_error Attestor::InvalidError
-    expect { b_to_a.validate :blocked }.to raise_error Attestor::InvalidError
+    expect { a_to_b.validate! }.to raise_error Attestor::InvalidError
+    expect { b_to_a.validate! :blocked }.to raise_error Attestor::InvalidError
   end
 
   after do

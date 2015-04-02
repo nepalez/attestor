@@ -122,7 +122,7 @@ describe Attestor::Validations do
 
   end # invalid
 
-  describe "#validate" do
+  describe "#validate!" do
 
     before do
       test_class.validate  :foo
@@ -140,7 +140,7 @@ describe Attestor::Validations do
         expect(subject).to receive(:foo)
         expect(subject).to receive(:bar)
         expect(subject).not_to receive(:baz)
-        subject.validate
+        subject.validate!
       end
 
     end # context
@@ -151,11 +151,11 @@ describe Attestor::Validations do
         expect(subject).to receive(:foo)
         expect(subject).to receive(:baz)
         expect(subject).not_to receive(:bar)
-        subject.validate :foo
+        subject.validate! :foo
       end
 
     end # context
 
-  end # describe #validate
+  end # describe #validate!
 
 end # describe Attestor::Validations

@@ -156,10 +156,10 @@ describe Attestor::Validations::Validator do
 
   end # describe #name
 
-  describe "#validate" do
+  describe "#validate!" do
 
     let(:object) { Class.new { private def foo; end }.new }
-    after        { subject.validate object }
+    after        { subject.validate! object }
 
     context "when no block initialized" do
 
@@ -181,6 +181,6 @@ describe Attestor::Validations::Validator do
 
     end # context
 
-  end # describe #validate
+  end # describe #validate!
 
 end # describe Attestor::Validation
