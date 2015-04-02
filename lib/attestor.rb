@@ -5,6 +5,7 @@ require "extlib"
 require_relative "attestor/version"
 
 require_relative "attestor/invalid_error"
+require_relative "attestor/report"
 
 require_relative "attestor/validations"
 require_relative "attestor/validations/validator"
