@@ -8,7 +8,7 @@ module Attestor
     class Or < Node
 
       def validate!
-        return if detect(&:valid?)
+        return if any_valid?
         super
       end
 

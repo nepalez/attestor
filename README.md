@@ -242,8 +242,6 @@ class Transfer
 end
 ```
 
-They also respond to `valid?` and `invalid?` methods (that rescue from `vaidate` missing any error messages).
-
 Complex Policies
 ----------------
 
@@ -252,8 +250,8 @@ Policies (assertions) can be combined by logical methods.
 Suppose we have two policy objects:
 
 ```ruby
-valid_policy.valid?   # => true
-invalid_policy.valid? # => false
+valid_policy.validate.valid?   # => true
+invalid_policy.validate.valid? # => false
 ```
 
 Use factory methods to provide compositions:

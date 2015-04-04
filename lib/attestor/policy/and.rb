@@ -8,7 +8,7 @@ module Attestor
     class And < Node
 
       def validate!
-        return unless detect(&:invalid?)
+        return unless any_invalid?
         super
       end
 

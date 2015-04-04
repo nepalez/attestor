@@ -36,24 +36,6 @@ module Attestor
       end
     end
 
-    # Checks whether the policy is valid
-    #
-    # @return [Boolean]
-    def valid?
-      validate!
-    rescue InvalidError
-      false
-    else
-      true
-    end
-
-    # Checks whether the policy is invalid
-    #
-    # @return [Boolean]
-    def invalid?
-      !valid?
-    end
-
     # Negates the current policy
     #
     # @return [Attestor::Policy::Not]

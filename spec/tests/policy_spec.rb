@@ -51,54 +51,6 @@ describe Attestor::Policy do
 
   end # describe .new
 
-  describe "#valid?" do
-
-    context "when #validate! method fails" do
-
-      before { allow(subject).to receive(:validate!) { fail invalid } }
-
-      it "returns false" do
-        expect(subject.valid?).to eq false
-      end
-
-    end
-
-    context "when #validate! method passes" do
-
-      before { allow(subject).to receive(:validate!) { nil } }
-
-      it "returns true" do
-        expect(subject.valid?).to eq true
-      end
-
-    end
-
-  end # describe #valid?
-
-  describe "#invalid?" do
-
-    context "when #validate! method fails" do
-
-      before { allow(subject).to receive(:validate!) { fail invalid } }
-
-      it "returns true" do
-        expect(subject.invalid?).to eq true
-      end
-
-    end
-
-    context "when #validate! method passes" do
-
-      before { allow(subject).to receive(:validate!) { nil } }
-
-      it "returns false" do
-        expect(subject.invalid?).to eq false
-      end
-
-    end
-
-  end # describe #invalid?
-
   describe "#and" do
 
     it "calls .and class factory method with self" do

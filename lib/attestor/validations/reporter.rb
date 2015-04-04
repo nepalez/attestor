@@ -4,7 +4,7 @@ module Attestor
 
   module Validations
 
-    # @api private
+    # @private
     module Reporter
 
       def validate(object)
