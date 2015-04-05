@@ -52,6 +52,10 @@ Style/FileName:
 Style/RaiseArgs:
   EnforcedStyle: compact
 
+Style/RescueModifier:
+  Exclude:
+    - '**/*_spec.rb'
+
 Style/SingleLineMethods:
   Exclude:
     - '**/*_spec.rb'

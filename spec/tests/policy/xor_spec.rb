@@ -17,7 +17,7 @@ describe Attestor::Policy::Xor do
 
   end # context
 
-  describe "#validate" do
+  describe "#validate!" do
 
     context "when both valid and invalid parts exist" do
 
@@ -43,6 +43,6 @@ describe Attestor::Policy::Xor do
 
     end # context
 
-  end # describe #validate
+  end # describe #validate!
 
 end # describe Policy::Base::Not

@@ -31,18 +31,42 @@ describe Attestor::Validations do
 
   describe ".validate" do
 
-    context "without options" do
+    context "with a name" do
 
       before { test_class.validate :foo }
 
       it "registers a validator" do
-        expect(test_class.validators.map(&:name)).to eq [:foo]
-        expect(test_class.validators.first).not_to be_kind_of delegator_class
+        item = test_class.validators.first
+        expect(item).to be_kind_of validator_class
+        expect(item).not_to be_kind_of delegator_class
+      end
+
+      it "assigns the name to the validator" do
+        item = test_class.validators.first
+        expect(item.name).to eq :foo
       end
 
     end # context
 
-    context "with restrictions" do
+    context "with a block" do
+
+      let(:block) { proc { foo } }
+      before      { test_class.validate(&block) }
+
+      it "registers a validator" do
+        item = test_class.validators.first
+        expect(item).to be_kind_of validator_class
+        expect(item).not_to be_kind_of delegator_class
+      end
+
+      it "assigns the block to the validator" do
+        item = test_class.validators.first
+        expect(item.block).to eq block
+      end
+
+    end # context
+
+    context "with options" do
 
       before { test_class.validate :foo, only: %w(bar baz), except: "bar" }
 
@@ -58,18 +82,40 @@ describe Attestor::Validations do
 
   describe ".validates" do
 
-    context "without options" do
+    context "with a name" do
 
       before { test_class.validates :foo }
 
       it "registers a delegator" do
-        expect(test_class.validators.map(&:name)).to eq [:foo]
-        expect(test_class.validators.first).to be_kind_of delegator_class
+        item = test_class.validators.first
+        expect(item).to be_kind_of delegator_class
+      end
+
+      it "assigns the name to the delegator" do
+        item = test_class.validators.first
+        expect(item.name).to eq :foo
       end
 
     end # context
 
-    context "with restrictions" do
+    context "with a block" do
+
+      let(:block) { proc { foo } }
+      before      { test_class.validates(&block) }
+
+      it "registers a delegator" do
+        item = test_class.validators.first
+        expect(item).to be_kind_of delegator_class
+      end
+
+      it "assigns the block to the delegator" do
+        item = test_class.validators.first
+        expect(item.block).to eq block
+      end
+
+    end # context
+
+    context "with options" do
 
       before { test_class.validates :foo, only: %w(bar baz), except: "bar" }
 
@@ -87,7 +133,13 @@ describe Attestor::Validations do
 
     shared_examples "raising an error" do |name, options = {}|
 
-      let(:message) { message_class.new(name, subject, options) }
+      let(:message) { double }
+      before do
+        allow(message_class)
+          .to receive(:new)
+          .with(name, subject, options)
+          .and_return message
+      end
 
       it "raises an InvalidError" do
         expect { invalid }.to raise_error invalid_error
@@ -121,6 +173,42 @@ describe Attestor::Validations do
     end
 
   end # invalid
+
+  describe "#validate!" do
+
+    before do
+      test_class.validate  :foo
+      test_class.validate  :bar, only: :all
+      test_class.validates :baz, only: :foo
+
+      allow(subject).to receive(:foo)
+      allow(subject).to receive(:bar)
+      allow(subject).to receive(:baz) { valid_policy }
+    end
+
+    context "without an argument" do
+
+      it "calls validators for :all context" do
+        expect(subject).to receive(:foo)
+        expect(subject).to receive(:bar)
+        expect(subject).not_to receive(:baz)
+        subject.validate!
+      end
+
+    end # context
+
+    context ":foo" do
+
+      it "calls validators for :foo context" do
+        expect(subject).to receive(:foo)
+        expect(subject).to receive(:baz)
+        expect(subject).not_to receive(:bar)
+        subject.validate! :foo
+      end
+
+    end # context
+
+  end # describe #validate!
 
   describe "#validate" do
 
@@ -156,6 +244,6 @@ describe Attestor::Validations do
 
     end # context
 
-  end # describe #validate
+  end # describe #validate!
 
 end # describe Attestor::Validations
