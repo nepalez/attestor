@@ -13,15 +13,10 @@ module Attestor
         @whitelist = normalize(only)
         @blacklist = normalize(except)
         @block     = block
-        generate_id
         freeze
       end
 
-      attr_reader :name
-
-      def ==(other)
-        other.instance_of?(self.class) ? id.equal?(other.id) : false
-      end
+      attr_reader :name, :whitelist, :blacklist, :block
 
       def used_in_context?(context)
         symbol = context.to_sym
@@ -32,13 +27,7 @@ module Attestor
         block ? object.instance_eval(&block) : object.__send__(name)
       end
 
-      protected
-
-      attr_reader :id
-
       private
-
-      attr_reader :whitelist, :blacklist, :block
 
       def whitelisted?(symbol)
         whitelist.empty? || whitelist.include?(symbol)
@@ -46,10 +35,6 @@ module Attestor
 
       def blacklisted?(symbol)
         blacklist.include? symbol
-      end
-
-      def generate_id
-        @id = [name, whitelist, blacklist].hash
       end
 
       def normalize(list)
