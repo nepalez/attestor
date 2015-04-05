@@ -41,7 +41,7 @@ module Attestor
       attr_reader :items
 
       def errors(object)
-        items.map { |validator| validator.validate(object) }.select(&:invalid?)
+        map { |validator| validator.validate(object) }.select(&:invalid?)
       end
 
     end # class Validators

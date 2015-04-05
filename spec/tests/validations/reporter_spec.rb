@@ -17,7 +17,9 @@ describe Attestor::Validations::Reporter do
 
     context "when #validate! fails" do
 
-      before { allow(subject).to receive(:validate!) { fail(error) } }
+      before do
+        allow(subject).to receive(:validate!).with(object) { fail(error) }
+      end
 
       it "returns an invalid report" do
         expect(result).to be_kind_of report
@@ -30,7 +32,7 @@ describe Attestor::Validations::Reporter do
 
     context "when #validate! passes" do
 
-      before { allow(subject).to receive(:validate!) { nil } }
+      before { allow(subject).to receive(:validate!).with(object) }
 
       it "returns a valid report" do
         expect(result).to be_kind_of report

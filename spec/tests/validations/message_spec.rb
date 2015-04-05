@@ -18,7 +18,7 @@ describe Attestor::Validations::Message do
 
   describe ".new" do
 
-    context "with a symbol argument" do
+    context "with a symbolic argument" do
 
       subject { described_class.new :invalid, scope, foo: "bar" }
 

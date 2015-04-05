@@ -87,7 +87,13 @@ describe Attestor::Validations do
 
     shared_examples "raising an error" do |name, options = {}|
 
-      let(:message) { message_class.new(name, subject, options) }
+      let(:message) { double }
+      before do
+        allow(message_class)
+          .to receive(:new)
+          .with(name, subject, options)
+          .and_return message
+      end
 
       it "raises an InvalidError" do
         expect { invalid }.to raise_error invalid_error

@@ -11,7 +11,7 @@ module Attestor
         validate! object
         Report.new(object)
       rescue InvalidError => error
-        Report.new(object, error)
+        Report.new(error.object, error)
       end
 
     end # module Reporter
