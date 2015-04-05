@@ -310,7 +310,7 @@ In a RSpec tests you can use spies for valid and invalid objects:
 * `invalid_spy` raises on `#validate!` and returns invalid report in responce to `#validate` method call.
 
 ```ruby
-include "attestor/rspec"
+require "attestor/rspec"
 
 describe "something" do
 
