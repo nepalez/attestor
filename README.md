@@ -301,6 +301,33 @@ Policy.not(valid_policy)
 
 As before, you can use any number of policies (except for negation of a single policy) at any number of nesting.
 
+RSpec helpers
+-------------
+
+In a RSpec tests you can use spies for valid and invalid objects:
+
+* `valid_spy` is a spy that returns `nil` in response to `#validate!` and valid report in responce to `#validate`.
+* `invalid_spy` raises on `#validate!` and returns invalid report in responce to `#validate` method call.
+
+```ruby
+include "attestor/rspec"
+
+describe "something" do
+
+  let(:valid_object)   { valid_spy   }
+  let(:invalid_object) { invalid_spy }
+
+  # ...
+end
+```
+
+To check whether an arbitrary object is valid, simply use `#validate` method's result:
+
+```ruby
+expect(object.validate).to be_valid
+expect(object.validate).to be_invalid
+```
+
 Latest changes
 --------------
 
@@ -309,6 +336,8 @@ Latest changes
 1. The method `#validate` doesn't raise an error. It returns a validation results report. To raise an exception use the unsafe `#validate!` method (see [Basic Use](#basic-use) for details).
 
 2. Policies doesn't have `#valid?` and `#invalid?` methods any longer. Both the methods are removed to `#validate` report.
+
+### Version 2.1.0
 
 Compatibility
 -------------
