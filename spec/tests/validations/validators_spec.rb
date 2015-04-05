@@ -63,16 +63,22 @@ describe Attestor::Validations::Validators do
 
     context "with a block" do
 
-      let(:result) { subject.add_validator { foo } }
+      let(:block)  { proc { foo } }
+      let(:result) { subject.add_validator(&block) }
 
       it "returns validators" do
         expect(result).to be_kind_of described_class
       end
 
-      it "adds validator (not a delegator)" do
+      it "adds a validator (not a delegator)" do
         item = result.first
         expect(item).to be_kind_of validator_class
         expect(item).not_to be_kind_of delegator_class
+      end
+
+      it "assigns a block to the validator" do
+        item = result.first
+        expect(item.block).to eq block
       end
 
     end # context
@@ -119,7 +125,8 @@ describe Attestor::Validations::Validators do
 
     context "with a block" do
 
-      let(:result) { subject.add_delegator { foo } }
+      let(:block)  { proc { foo } }
+      let(:result) { subject.add_delegator(&block) }
 
       it "returns validators" do
         expect(result).to be_kind_of described_class
@@ -128,6 +135,11 @@ describe Attestor::Validations::Validators do
       it "adds a delegator" do
         item = result.first
         expect(item).to be_kind_of delegator_class
+      end
+
+      it "assigns a block to the delegator" do
+        item = result.first
+        expect(item.block).to eq block
       end
 
     end # context
