@@ -47,7 +47,7 @@ describe Attestor::Policy::Node do
 
     it "iterates through branches' validation reports" do
       subject = described_class.new(branches)
-      expect(subject.to_a).to eq [1, 2, 3]
+      expect(subject.to_a).to eq [0, 1, 2]
     end
 
   end # each
