@@ -115,23 +115,23 @@ credit = OpenStruct.new(sum: 90)
 fraud_transfer = Transfer.new(debet, credit)
 
 begin
-  transfer.validate!
+  transfer.validate!       # with the bang
 rescue Attestor::InvalidError => error
   error.object == transfer # => true
   error.messages           # => ["Credit differs from debet by 10"]
 end
 ```
 
-Another option is to use the safe version `#validate`. It rescues from the exception and returns results as a separate object:
+Another option is to use the safe version `#validate`. It rescues from the exception and returns results in a separate report object:
 
 ```ruby
-result = transfer.validate!
+report = transfer.validate  # without the bang
 
-result.valid?               # => false
-result.invalid?             # => true
-result.object == transfer   # => true
-result.messages             # => ["Credit differs from debet by 10"]
-result.error                # => <Attestor::InvalidError ...>
+report.valid?               # => false
+report.invalid?             # => true
+report.object == transfer   # => true
+report.messages             # => ["Credit differs from debet by 10"]
+report.error                # => <Attestor::InvalidError ...>
 ```
 
 Use of Contexts
@@ -298,6 +298,15 @@ Policy.not(valid_policy)
 ```
 
 As before, you can use any number of policies (except for negation of a single policy) at any number of nesting.
+
+Latest changes
+--------------
+
+### Version 2.0.0
+
+1. The method `#validate` doesn't raise an error. It returns a validation results report. To raise an exception use the unsafe `#validate!` method (see [Basic Use](#basic-use) for details).
+
+2. Policies doesn't have `#valid?` and `#invalid?` methods any longer. Both the methods are removed to `#validate` report.
 
 Compatibility
 -------------
