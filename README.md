@@ -86,7 +86,7 @@ Transfer = Struct.new(:debet, :credit) do
 end
 ```
 
-Alternatively, you can describe validation in the block (called in the scope of instance):
+Alternatively, you can describe validation in a block, executed in an instance's scope:
 
 ```ruby
 class Transfer
@@ -95,7 +95,7 @@ class Transfer
 end
 ```
 
-The `#invalid` method translates its argument in a current class scope and raises an exception with that method.
+The `#invalid` method translates its argument and raises an exception with the resulting message.
 
 ```yaml
 # config/locales/en.yml
@@ -107,7 +107,7 @@ en:
         inconsistent: "Credit differs from debet by %{fraud}"
 ```
 
-To run validations use the `#validate!` instance method:
+To validate an object, use its `#validate!` method:
 
 ```ruby
 debet  = OpenStruct.new(sum: 100)
@@ -122,7 +122,8 @@ rescue Attestor::InvalidError => error
 end
 ```
 
-Another option is to use the safe version `#validate`. It rescues from the exception and returns results in a separate report object:
+Alternatively use the safe version `#validate`.
+It rescues from an exception and returns a corresponding report:
 
 ```ruby
 report = transfer.validate  # without the bang
@@ -133,6 +134,8 @@ report.object == transfer   # => true
 report.messages             # => ["Credit differs from debet by 10"]
 report.error                # => <Attestor::InvalidError ...>
 ```
+
+Once again, the report collects messages outside of the checked object.
 
 Use of Contexts
 ---------------
@@ -155,14 +158,13 @@ fraud_transfer.validate!                 # => InvalidError
 fraud_transfer.validate! :steal_of_money # => PASSES!
 ```
 
-You can use the same validator several times with different contexts.
+You can use the same validator several times with different contexts. They will be used independently from each other.
 
 ```ruby
 class Transfer
   # ...
 
-  # validate :consistent, only: [:fair_trade, :legal]
-  validate :consistent, only: :fair_trade
+  validate :consistent, only: :fair_trade, :consistent
   validate :consistent, only: :legal
 
 end
@@ -183,7 +185,7 @@ ConsistentTransfer = Struct.new(:debet, :credit) do
 end
 ```
 
-Then use `validates` helper:
+Then use `validates` helper (with an "s" at the end):
 
 ```ruby
 class Transfer 
@@ -204,7 +206,7 @@ class Transfer
   end
 ```
 
-The difference between `.validate :something` and `.validates :something` class methods is that:
+The difference between `.validate :something` and `.validates :something` methods is that:
 * `.validate` expects `#something` to make checks and raise error by itself
 * `.validates` expects `#something` to respond to `#validate!`
 
