@@ -8,7 +8,7 @@ module Attestor
     class Xor < Node
 
       def validate!
-        return if any_valid? && any_invalid?
+        return if detect(&:valid?) && detect(&:invalid?)
         super
       end
 

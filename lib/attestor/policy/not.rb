@@ -12,7 +12,7 @@ module Attestor
       end
 
       def validate!
-        return unless any_valid?
+        return unless detect(&:valid?)
         super
       end
 

@@ -2,13 +2,13 @@
 
 describe Attestor::Policy::Node do
 
-  let(:policy_class)  { Attestor::Policy }
+  let(:policy_module) { Attestor::Policy       }
   let(:invalid_error) { Attestor::InvalidError }
 
   describe ".new" do
 
     it "creates a policy" do
-      expect(subject).to be_kind_of policy_class
+      expect(subject).to be_kind_of policy_module
     end
 
     it "creates a collection" do
@@ -39,15 +39,15 @@ describe Attestor::Policy::Node do
 
   describe "#each" do
 
-    let(:branches) { 3.times.map { double } }
+    let(:branches) { 3.times.map { |n| double validate: n } }
 
     it "returns an enumerator" do
       expect(subject.each).to be_kind_of Enumerator
     end
 
-    it "iterates through brances" do
+    it "iterates through branches' validation reports" do
       subject = described_class.new(branches)
-      expect(subject.to_a).to eq branches
+      expect(subject.to_a).to eq [1, 2, 3]
     end
 
   end # each

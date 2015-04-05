@@ -8,29 +8,19 @@ module Attestor
     class Node
       include Attestor::Policy, Enumerable
 
+      attr_reader :branches
+
       def initialize(*branches)
         @branches = branches.flatten
         freeze
       end
-
-      attr_reader :branches
 
       def validate!
         invalid :base
       end
 
       def each
-        block_given? ? branches.each { |item| yield(item) } : to_enum
-      end
-
-      private
-
-      def any_valid?
-        detect { |item| item.validate.valid? }
-      end
-
-      def any_invalid?
-        detect { |item| item.validate.invalid? }
+        block_given? ? branches.each { |item| yield(item.validate) } : to_enum
       end
 
     end # class Node
