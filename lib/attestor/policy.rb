@@ -2,7 +2,7 @@
 
 module Attestor
 
-  # API for policies that validates another objects
+  # API for policies that validate another objects
   module Policy
     # @!parse include Attestor::Validations
     # @!parse extend Attestor::Validations::ClassMethods
