@@ -13,6 +13,7 @@ require_relative "attestor/validations/validator"
 require_relative "attestor/validations/delegator"
 require_relative "attestor/validations/validators"
 require_relative "attestor/validations/message"
+require_relative "attestor/validations/context"
 
 require_relative "attestor/policy/factory"
 require_relative "attestor/policy"
