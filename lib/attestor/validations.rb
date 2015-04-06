@@ -111,6 +111,27 @@ module Attestor
         @validators = validators.add_delegator(*args, &block)
       end
 
+      # Groups validations assigned to shared context
+      #
+      # @example
+      #   validations only: :foo do
+      #     validates :bar
+      #     validate  { invalid :foo unless baz }
+      #   end
+      #
+      #   # this is equal to:
+      #
+      #   validates :bar, only: :foo
+      #   validate  { invalid :foo unless baz }, only: :foo
+      #
+      # @param [Hash] options
+      # @param [Proc] block
+      #
+      # @return [undefined]
+      def validations(**options, &block)
+        Context.new(self, options).instance_eval(&block) if block_given?
+      end
+
     end # module ClassMethods
 
     # @private

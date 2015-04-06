@@ -129,6 +129,39 @@ describe Attestor::Validations do
 
   end # describe .validates
 
+  describe ".validations" do
+
+    let(:options)       { { only: :bar, except: :baz }         }
+    let(:context_class) { Attestor::Validations::Context       }
+    let(:context)       { double validate: nil, validates: nil }
+    before { allow(context_class).to receive(:new) { context } }
+
+    context "with a block" do
+
+      after { test_class.validations(options) { validate :foo } }
+
+      it "initializes a context group" do
+        expect(context_class).to receive(:new).with(test_class, options)
+      end
+
+      it "calls the block in a context's scope" do
+        expect(context).to receive(:validate).with(:foo)
+      end
+
+    end # context
+
+    context "without a block" do
+
+      after { test_class.validations(options) }
+
+      it "does nothing" do
+        expect(context_class).not_to receive(:new)
+      end
+
+    end # context
+
+  end # describe .validations
+
   describe "#invalid" do
 
     shared_examples "raising an error" do |name, options = {}|
