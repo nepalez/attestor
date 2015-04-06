@@ -8,6 +8,8 @@ module Attestor
     include ::RSpec::Mocks::ExampleMethods
 
     # Mocks a valid object
+    #
+    # @return [RSpec::Mocks::Double]
     def valid_spy
       object = spy
       allow(object).to receive(:validate!)
@@ -16,7 +18,11 @@ module Attestor
       object
     end
 
-    # Mocks an invalid object
+    # Mocks an invalid object with given error messages
+    #
+    # @param [String, Array<String>] messages
+    #
+    # @return [RSpec::Mocks::Double]
     def invalid_spy(messages = "invalid")
       object = spy
       error  = InvalidError.new(object, messages)
