@@ -170,6 +170,22 @@ class Transfer
 end
 ```
 
+You can group validations that uses shared context:
+
+```ruby
+class Transfer
+
+  # This is the same as:
+  #
+  # validate :consistent, only: :fair_trade
+  # validate :limited, only: :fair_trade
+  validations only: :fair_trade do
+    validate :consistent
+    validate :limited
+  end
+end
+```
+
 Delegation
 ----------
 
