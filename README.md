@@ -40,9 +40,9 @@ Approach
 Instead of collecting errors inside the object, the module defines two instance methods:
 
 * `validate!` raises an exception (`Attestor::InvalidError`), that carries errors outside of the object.
-* `validate` - the safe version of `validate!`. It rescues an exception and returns special result object, that carries error info outside of the object.
+* `validate` - the safe version of `validate!`. It rescues from the exception and returns a report object, that carries the exception as well as its error messages.
 
-The object stays untouched (and can be made immutable).
+In both cases the inspected object stays untouched (and can be made immutable).
 
 Installation
 ------------
