@@ -66,8 +66,8 @@ Or add it manually:
 gem install attestor
 ```
 
-Basic Use
-----------
+Base Use
+--------
 
 Declare validation in the same way as ActiveModel's `.validate` method does:
 
@@ -134,8 +134,6 @@ report.object == transfer   # => true
 report.messages             # => ["Credit differs from debet by 10"]
 report.error                # => <Attestor::InvalidError ...>
 ```
-
-Once again, the report collects messages outside of the checked object.
 
 Use of Contexts
 ---------------
