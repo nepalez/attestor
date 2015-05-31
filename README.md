@@ -342,25 +342,14 @@ expect(object.validate).to be_valid
 expect(object.validate).to be_invalid
 ```
 
-Latest changes
---------------
-
-### Version 2.0.0
-
-1. The method `#validate` doesn't raise an error. It returns a validation results report. To raise an exception use the unsafe `#validate!` method (see [Basic Use](#basic-use) for details).
-
-2. Policies doesn't have `#valid?` and `#invalid?` methods any longer. Both the methods are removed to `#validate` report.
-
-### Version 2.1.0
-
 Compatibility
 -------------
 
-Tested under rubies compatible to rubies with API 2.0+:
+Tested under rubies compatible to rubies with API 1.9.3+:
 
-* MRI 2.0+
-* Rubinius-2 (mode 2.0)
-* JRuby 9000+ (mode 2.0+)
+* MRI 1.9.3+
+* Rubinius-2 (modes 1.9+)
+* JRuby 9.0.0.0.pre1+
 
 Uses [RSpec] 3.0+ for testing and [hexx-suit] for dev/test tools collection.
 
@@ -370,21 +359,20 @@ Uses [RSpec] 3.0+ for testing and [hexx-suit] for dev/test tools collection.
 Contributing
 ------------
 
-* Fork the project.
 * Read the [STYLEGUIDE](config/metrics/STYLEGUIDE).
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with Rakefile or version
-  (if you want to have your own version, that is fine but bump version
-  in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+* Fork the project
+* Create your feature branch (`git checkout -b my-new-feature`)
+* Add tests for it
+* Commit your changes (`git commit -am '[UPDATE] Add some feature'`)
+* Push to the branch (`git push origin my-new-feature`)
+* Create a new Pull Request
+
+Latest Changes
+--------------
+
+See the [CHANGELOG](CHANGELOG.md)
 
 License
 -------
 
 See the [MIT LICENSE](LICENSE).
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/nepalez/attestor/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
