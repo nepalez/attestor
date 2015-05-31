@@ -32,7 +32,7 @@ module Attestor
     def self.new(*attributes, &block)
       Struct.new(*attributes) do
         include Policy
-        instance_eval(&block) if block_given?
+        class_eval(&block) if block_given?
       end
     end
 
