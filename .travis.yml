@@ -7,3 +7,4 @@ rvm:
   - ruby-head
   - rbx-2 --2.0
   - jruby-9.0.0.0.pre1
+  - 1.9.3
