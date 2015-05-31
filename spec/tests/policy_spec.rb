@@ -37,8 +37,14 @@ describe Attestor::Policy do
     end
 
     it "yields the block in class scope" do
-      subject = described_class.new(:foo) { attr_reader :bar }
+      subject = described_class.new(:foo) do
+        attr_reader :bar
+        def foobar; end
+        def self.barfoo; end
+      end
       expect(subject.new(:baz)).to respond_to :bar
+      expect(subject.new(:baz)).to respond_to :foobar
+      expect(subject.new(:baz).class).to respond_to :barfoo
     end
 
   end # describe .new
