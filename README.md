@@ -3,6 +3,8 @@ Attestor
 
 Validations and policies for immutable Ruby objects
 
+**The project is frozen in favor of the [Assertion] gem, that implements even more clean way of setting statements about objects, and validating them.**
+
 [![Gem Version](https://img.shields.io/gem/v/attestor.svg?style=flat)][gem]
 [![Build Status](https://img.shields.io/travis/nepalez/attestor/master.svg?style=flat)][travis]
 [![Dependency Status](https://img.shields.io/gemnasium/nepalez/attestor.svg?style=flat)][gemnasium]
