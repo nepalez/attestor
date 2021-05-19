@@ -1,0 +1,17 @@
+---
+name: Notify sample_app about the update
+on:
+  push:
+    branches:
+      - master
+jobs:
+  notify-sample-app:
+    runs-on: ubuntu-latest
+    steps:
+     - name: Notify sample_app
+       uses: peter-evans/repository-dispatch@v1
+       with:
+         token: ${{ secrets.REPO_ACCESS_TOKEN }}
+         repository: nepalez/sample_app
+         event-type: attestor-updated
+         client-payload: '{}'
